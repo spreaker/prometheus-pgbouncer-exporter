@@ -32,7 +32,7 @@ class PgbouncersMetricsCollector():
         elif data["type"] is "gauge":
             return GaugeMetricFamily(data["name"], data["help"], labels=data["labels"].keys())
         else:
-            raise Exception(f"Unsupported metric type: {data['type']}")
+            raise Exception("Unsupported metric type: {type}".format(type=data['type']))
 
 
 class PgbouncerMetricsCollector():
@@ -81,7 +81,7 @@ class PgbouncerMetricsCollector():
                 success = False
 
         except Exception as error:
-            logging.getLogger().debug(f"Unable fetch metrics from {self.config.getDsnWithMaskedPassword()}", extra={"exception": str(error)})
+            logging.getLogger().debug("Unable fetch metrics from {dsn}".format(dsn=self.config.getDsnWithMaskedPassword()), extra={"exception": str(error)})
 
             success = False
         finally:
@@ -113,7 +113,7 @@ class PgbouncerMetricsCollector():
 
                 metrics.append({
                     "type":   mapping["type"],
-                    "name":   f"{metricPrefix}{mapping['metric']}",
+                    "name":   metricPrefix + mapping['metric'],
                     "value":  result[mapping["column"]],
                     "labels": labels,
                     "help":   mapping["help"]
@@ -147,7 +147,7 @@ class PgbouncerMetricsCollector():
 
             return cursor.fetchall()
         except Exception as error:
-            logging.getLogger().debug(f"Unable run query {query} on {self.config.getDsnWithMaskedPassword()}", extra={"exception": str(error)})
+            logging.getLogger().debug("Unable run query {query} on {dsn}".format(query=query, dsn=self.config.getDsnWithMaskedPassword()), extra={"exception": str(error)})
 
             return False
         finally:

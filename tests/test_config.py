@@ -14,7 +14,7 @@ class TestConfig(unittest.TestCase):
 
     def testShouldSupportAnEmptyConfigFile(self):
         config = Config()
-        config.read(f"{CURR_DIR}/fixtures/config-empty.yml")
+        config.read(CURR_DIR + "/fixtures/config-empty.yml")
 
         self.assertEqual(config.getExporterHost(), "127.0.0.1")
         self.assertEqual(config.getExporterPort(), 9100)
@@ -22,7 +22,7 @@ class TestConfig(unittest.TestCase):
 
     def testShouldParseConfigFileWithOnePgbouncer(self):
         config = Config()
-        config.read(f"{CURR_DIR}/fixtures/config-with-one-pgbouncer.yml")
+        config.read(CURR_DIR + "/fixtures/config-with-one-pgbouncer.yml")
 
         self.assertEqual(config.getExporterHost(), "0.0.0.0")
         self.assertEqual(config.getExporterPort(), 1234)
@@ -37,7 +37,7 @@ class TestConfig(unittest.TestCase):
 
     def testShouldParseConfigFileWithTwoPgbouncer(self):
         config = Config()
-        config.read(f"{CURR_DIR}/fixtures/config-with-two-pgbouncer.yml")
+        config.read(CURR_DIR + "/fixtures/config-with-two-pgbouncer.yml")
 
         self.assertEqual(config.getExporterHost(), "0.0.0.0")
         self.assertEqual(config.getExporterPort(), 1234)
@@ -65,7 +65,7 @@ class TestConfig(unittest.TestCase):
         os.environ["TEST_EXTRA_LABEL_VALUE"] = "users-1-1000"
 
         config = Config()
-        config.read(f"{CURR_DIR}/fixtures/config-with-env-vars.yml")
+        config.read(CURR_DIR + "/fixtures/config-with-env-vars.yml")
 
         self.assertEqual(len(config.getPgbouncers()), 1)
         self.assertEqual(config.getPgbouncers()[0].getDsn(), "postgresql://marco:secret@host:6431/pgbouncer")
@@ -80,7 +80,7 @@ class TestConfig(unittest.TestCase):
         os.environ["TEST_EXTRA_LABEL_VALUE"] = "users-1-1000"
 
         config = Config()
-        config.read(f"{CURR_DIR}/fixtures/config-with-env-vars.yml")
+        config.read(CURR_DIR + "/fixtures/config-with-env-vars.yml")
 
         self.assertEqual(len(config.getPgbouncers()), 1)
         self.assertEqual(config.getPgbouncers()[0].getDsn(), "postgresql://marco:@host:6431/pgbouncer")
@@ -93,7 +93,7 @@ class TestConfig(unittest.TestCase):
         os.environ["TEST_EXTRA_LABEL_VALUE"] = "users-1-1000"
 
         config = Config()
-        config.read(f"{CURR_DIR}/fixtures/config-with-env-vars.yml")
+        config.read(CURR_DIR + "/fixtures/config-with-env-vars.yml")
 
         self.assertEqual(len(config.getPgbouncers()), 1)
         self.assertEqual(config.getPgbouncers()[0].getDsn(), "postgresql://$(TEST_USERNAME):secret@host:6431/pgbouncer")

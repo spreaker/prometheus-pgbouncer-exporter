@@ -48,9 +48,9 @@ def main():
     config = Config()
     try:
         config.read(args.config)
-        logging.getLogger().info(f"Config file successfully read from {args.config}")
+        logging.getLogger().info("Config file successfully read from {file}".format(file=args.config))
     except Exception as error:
-        logging.getLogger().fatal(f"Unable to read config file from {args.config}", extra={"exception": str(error)})
+        logging.getLogger().fatal("Unable to read config file from {file}".format(file=args.config), extra={"exception": str(error)})
         sys.exit(1)
 
     # Register our custom collector
@@ -58,7 +58,7 @@ def main():
 
     # Start server
     start_http_server(config.getExporterPort(), config.getExporterHost())
-    logging.getLogger().info(f"Exporter listening on {config.getExporterHost()}:{config.getExporterPort()}")
+    logging.getLogger().info("Exporter listening on {host}:{port}".format(host=config.getExporterHost(), port=config.getExporterPort()))
 
     while not signal_handler.is_shutting_down():
         time.sleep(1)
