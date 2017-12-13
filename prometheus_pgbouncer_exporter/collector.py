@@ -82,7 +82,7 @@ class PgbouncerMetricsCollector():
                 success = False
 
         except Exception as error:
-            logging.getLogger().debug(f"Unable fetch metrics from {self.config.getDnsWithMaskedPassword()}", extra={"exception": str(error)})
+            logging.getLogger().debug(f"Unable fetch metrics from {self.config.getDsnWithMaskedPassword()}", extra={"exception": str(error)})
 
             success = False
         finally:

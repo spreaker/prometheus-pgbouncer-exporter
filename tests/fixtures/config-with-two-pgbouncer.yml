@@ -1,0 +1,16 @@
+exporter_host: 0.0.0.0
+exporter_port: 1234
+
+pgbouncers:
+  - dsn: postgresql://user:password@host:6431/pgbouncer
+    connect_timeout: 2
+    include_databases:
+      - one
+      - two
+    exclude_databases:
+      - three
+    extra_labels:
+      first: 1
+      second: 2
+
+  - dsn: postgresql://user:password@host:6432/pgbouncer

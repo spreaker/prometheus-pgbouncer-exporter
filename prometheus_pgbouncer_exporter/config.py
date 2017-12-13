@@ -67,8 +67,7 @@ class PgbouncerConfig():
     def getDsn(self):
         return self.config["dsn"] if "dsn" in self.config else "postgresql://pgbouncer:@localhost:6431/pgbouncer"
 
-    # TODO test me
-    def getDnsWithMaskedPassword(self):
+    def getDsnWithMaskedPassword(self):
         match = DSN_PASSWORD_MASK_PATTERN.match(self.getDsn())
         if match:
             return match.group(1) + "***" + match.group(3)

@@ -12,7 +12,7 @@ pgbouncers:
     #     variable if exist, or left untouched if doesn't exist
     dsn: postgresql://pgbouncer:$(PGBOUNCER_PASS)@localhost:6431/pgbouncer
 
-    # The pgbouncer connection timeout in seconds
+    # The pgbouncer connection timeout in seconds (defaults to 5 seconds)
     connect_timeout: 5
 
     # Databases to report metrics for. If omitted or empty, all databases
