@@ -3,7 +3,7 @@ import logging
 from typing import List
 from psycopg2.extras import DictCursor
 from prometheus_client.core import CounterMetricFamily, GaugeMetricFamily
-from config import PgbouncerConfig
+from .config import PgbouncerConfig
 
 
 class PgbouncersMetricsCollector():
@@ -46,8 +46,7 @@ class PgbouncerMetricsCollector():
 
         try:
             # Connect to pgbouncer
-            conn = psycopg2.connect(dsn=self.config.getDsn(), connect_timeout=self.config.getConnectTimeout())
-            conn.set_session(autocommit=True)
+            conn = self._createConnection()
 
             # SHOW STATS
             results = self._fetchMetrics(conn, "SHOW STATS")
@@ -160,3 +159,9 @@ class PgbouncerMetricsCollector():
         finally:
             if cursor:
                 cursor.close()
+
+    def _createConnection(self):
+        conn = psycopg2.connect(dsn=self.config.getDsn(), connect_timeout=self.config.getConnectTimeout())
+        conn.set_session(autocommit=True)
+
+        return conn

@@ -6,8 +6,8 @@ import argparse
 from prometheus_client import start_http_server
 from prometheus_client.core import REGISTRY
 from pythonjsonlogger import jsonlogger
-from config import Config
-from collector import PgbouncersMetricsCollector
+from .config import Config
+from .collector import PgbouncersMetricsCollector
 
 
 class SignalHandler():

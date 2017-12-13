@@ -109,14 +109,17 @@ The configuration file supports environment variables replacement. If you use th
 
 ## Contributions
 
-### Ensure the code is PEP 8 compliant
+### Run locally
 
-`pycodestyle --max-line-length=300 prometheus_pgbouncer_exporter/*.py`
-
+`python3 -m prometheus_pgbouncer_exporter.cli --config ./config.yml`
 
 ### Run tests
 
 `python3 -m unittest`
+
+### Ensure the code is PEP 8 compliant
+
+`pycodestyle --max-line-length=300 prometheus_pgbouncer_exporter/*.py`
 
 
 ## License
