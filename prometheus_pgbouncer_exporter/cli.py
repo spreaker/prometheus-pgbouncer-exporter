@@ -65,5 +65,6 @@ def main():
 
     logging.getLogger().info("Exporter has shutdown")
 
+
 if __name__ == '__main__':
     main()

@@ -5,13 +5,13 @@ import re
 # Define the regex used to replace $(ENV_VAR) with ENV_VAR value
 ENV_VAR_REPLACER_PATTERN = re.compile(r'^(.*)\$\(([^\)]+)\)(.*)$')
 
-# Define the regex used to mask the password in the DSN
+# Define the regex used to mask the password in the DSN
 DSN_PASSWORD_MASK_PATTERN = re.compile(r'^(.*:)([^@]+)(@.*)$')
 
 
 class Config():
     def __init__(self):
-        self.config     = {}
+        self.config = {}
         self.pgbouncers = False
 
     def getExporterHost(self):
@@ -38,7 +38,7 @@ class Config():
 
         # Setup environment variables replacement
         def env_var_replacer(loader, node):
-            value                         = loader.construct_scalar(node)
+            value = loader.construct_scalar(node)
             beforePart, envVar, afterPart = ENV_VAR_REPLACER_PATTERN.match(value).groups()
 
             if envVar in os.environ:
@@ -46,12 +46,12 @@ class Config():
             else:
                 return beforePart + envVar + afterPart
 
-        yaml.add_implicit_resolver ("!envvarreplacer", ENV_VAR_REPLACER_PATTERN)
+        yaml.add_implicit_resolver("!envvarreplacer", ENV_VAR_REPLACER_PATTERN)
         yaml.add_constructor('!envvarreplacer', env_var_replacer)
 
         # Read file
         try:
-            stream      = open(filepath, "r")
+            stream = open(filepath, "r")
             self.config = yaml.load(stream)
         finally:
             if stream:
@@ -87,7 +87,7 @@ class PgbouncerConfig():
         # Lazy instance extra labels
         if self.labels is False:
             if "extra_labels" in self.config:
-                self.labels = { item["name"]: str(item["value"]) for item in self.config["extra_labels"] }
+                self.labels = {item["name"]: str(item["value"]) for item in self.config["extra_labels"]}
             else:
                 self.labels = {}
 

@@ -19,7 +19,7 @@ class PgbouncersMetricsCollector():
 
         # Instance metrics
         for data in entries:
-            name          = data["name"]
+            name = data["name"]
             metrics[name] = metrics[name] if name in metrics else self._instanceMetric(data)
             metrics[name].add_metric(value=data["value"], labels=data["labels"].values())
 
@@ -40,13 +40,13 @@ class PgbouncerMetricsCollector():
         self.config = config
 
     def collect(self):
-        conn    = False
+        conn = False
         metrics = []
         success = True
 
         try:
             # Connect to pgbouncer
-            conn = psycopg2.connect(dsn = self.config.getDsn(), connect_timeout = self.config.getConnectTimeout())
+            conn = psycopg2.connect(dsn=self.config.getDsn(), connect_timeout=self.config.getConnectTimeout())
             conn.set_session(autocommit=True)
 
             # SHOW STATS
@@ -55,11 +55,11 @@ class PgbouncerMetricsCollector():
                 results = self._filterMetricsByIncludeDatabases(results, self.config.getIncludeDatabases())
                 results = self._filterMetricsByExcludeDatabases(results, self.config.getExcludeDatabases())
                 metrics += self._exportMetrics(results, "pgbouncer_stats_", [
-                    { "type": "counter", "column": "total_requests",   "metric": "queries_total",                 "help": "Total number of SQL queries pooled by pgbouncer" },
-                    { "type": "counter", "column": "total_query_time", "metric": "queries_duration_microseconds", "help": "Total number of microseconds spent by pgbouncer when actively connected to PostgreSQL" },
-                    { "type": "counter", "column": "total_received",   "metric": "received_bytes_total",          "help": "Total volume in bytes of network traffic received by pgbouncer" },
-                    { "type": "counter", "column": "total_sent",       "metric": "sent_bytes_total",              "help": "Total volume in bytes of network traffic sent by pgbouncer" },
-                ], [ "database" ], self.config.getExtraLabels())
+                    {"type": "counter", "column": "total_requests",   "metric": "queries_total",                 "help": "Total number of SQL queries pooled by pgbouncer"},
+                    {"type": "counter", "column": "total_query_time", "metric": "queries_duration_microseconds", "help": "Total number of microseconds spent by pgbouncer when actively connected to PostgreSQL"},
+                    {"type": "counter", "column": "total_received",   "metric": "received_bytes_total",          "help": "Total volume in bytes of network traffic received by pgbouncer"},
+                    {"type": "counter", "column": "total_sent",       "metric": "sent_bytes_total",              "help": "Total volume in bytes of network traffic sent by pgbouncer"},
+                ], ["database"], self.config.getExtraLabels())
             else:
                 success = False
 
@@ -69,20 +69,20 @@ class PgbouncerMetricsCollector():
                 results = self._filterMetricsByIncludeDatabases(results, self.config.getIncludeDatabases())
                 results = self._filterMetricsByExcludeDatabases(results, self.config.getExcludeDatabases())
                 metrics += self._exportMetrics(results, "pgbouncer_pools_", [
-                    { "type": "gauge", "column": "cl_active",  "metric": "client_active_connections",   "help": "Client connections that are linked to server connection and can process queries" },
-                    { "type": "gauge", "column": "cl_waiting", "metric": "client_waiting_connections",  "help": "Client connections have sent queries but have not yet got a server connection" },
-                    { "type": "gauge", "column": "sv_active",  "metric": "server_active_connections",   "help": "Server connections that linked to client" },
-                    { "type": "gauge", "column": "sv_idle",    "metric": "server_idle_connections",     "help": "Server connections that unused and immediately usable for client queries" },
-                    { "type": "gauge", "column": "sv_used",    "metric": "server_used_connections",     "help": "Server connections that have been idle more than server_check_delay, so they needs server_check_query to run on it before it can be used" },
-                    { "type": "gauge", "column": "sv_tested",  "metric": "server_testing_connections",  "help": "Server connections that are currently running either server_reset_query or server_check_query" },
-                    { "type": "gauge", "column": "sv_login",   "metric": "server_login_connections",    "help": "Server connections currently in logging in process" },
-                    { "type": "gauge", "column": "maxwait",    "metric": "client_maxwait_seconds",      "help": "How long the first (oldest) client in queue has waited, in seconds" },
-                ], [ "database", "user" ], self.config.getExtraLabels())
+                    {"type": "gauge", "column": "cl_active",  "metric": "client_active_connections",   "help": "Client connections that are linked to server connection and can process queries"},
+                    {"type": "gauge", "column": "cl_waiting", "metric": "client_waiting_connections",  "help": "Client connections have sent queries but have not yet got a server connection"},
+                    {"type": "gauge", "column": "sv_active",  "metric": "server_active_connections",   "help": "Server connections that linked to client"},
+                    {"type": "gauge", "column": "sv_idle",    "metric": "server_idle_connections",     "help": "Server connections that unused and immediately usable for client queries"},
+                    {"type": "gauge", "column": "sv_used",    "metric": "server_used_connections",     "help": "Server connections that have been idle more than server_check_delay, so they needs server_check_query to run on it before it can be used"},
+                    {"type": "gauge", "column": "sv_tested",  "metric": "server_testing_connections",  "help": "Server connections that are currently running either server_reset_query or server_check_query"},
+                    {"type": "gauge", "column": "sv_login",   "metric": "server_login_connections",    "help": "Server connections currently in logging in process"},
+                    {"type": "gauge", "column": "maxwait",    "metric": "client_maxwait_seconds",      "help": "How long the first (oldest) client in queue has waited, in seconds"},
+                ], ["database", "user"], self.config.getExtraLabels())
             else:
                 success = False
 
         except Exception as error:
-            logging.getLogger().debug(f"Unable fetch metrics from {self.config.getDnsWithMaskedPassword()}", extra={ "exception": str(error) })
+            logging.getLogger().debug(f"Unable fetch metrics from {self.config.getDnsWithMaskedPassword()}", extra={"exception": str(error)})
 
             success = False
         finally:
@@ -109,7 +109,7 @@ class PgbouncerMetricsCollector():
                 if not mapping["column"] in result:
                     continue
 
-                labels = { key: result[key] for key in metricLabels }
+                labels = {key: result[key] for key in metricLabels}
                 labels.update(extraLabels)
 
                 metrics.append({

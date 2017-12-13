@@ -42,7 +42,7 @@ The exporter exports the following metrics for each monitored pgbouncer instance
 
 ### Ensure the code is PEP 8 compliant
 
-`pycodestyle --max-line-length=180 prometheus_pgbouncer_exporter/*.py`
+`pycodestyle --max-line-length=300 prometheus_pgbouncer_exporter/*.py`
 
 
 ## License
