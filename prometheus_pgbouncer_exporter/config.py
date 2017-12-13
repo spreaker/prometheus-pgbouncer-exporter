@@ -1,0 +1,94 @@
+import yaml
+import os
+import re
+
+# Define the regex used to replace $(ENV_VAR) with ENV_VAR value
+ENV_VAR_REPLACER_PATTERN = re.compile(r'^(.*)\$\(([^\)]+)\)(.*)$')
+
+# Define the regex used to mask the password in the DSN
+DSN_PASSWORD_MASK_PATTERN = re.compile(r'^(.*:)([^@]+)(@.*)$')
+
+
+class Config():
+    def __init__(self):
+        self.config     = {}
+        self.pgbouncers = False
+
+    def getExporterHost(self):
+        return self.config["exporter_host"] if "exporter_host" in self.config else "127.0.0.1"
+
+    def getExporterPort(self):
+        return self.config["exporter_port"] if "exporter_port" in self.config else "9100"
+
+    def getExporterPath(self):
+        return self.config["exporter_path"] if "exporter_path" in self.config else "/metrics"
+
+    def getPgbouncers(self):
+        # Lazy instance pgbouncer config
+        if self.pgbouncers is False:
+            if "pgbouncers" in self.config:
+                self.pgbouncers = list(map(lambda item: PgbouncerConfig(item), self.config["pgbouncers"]))
+            else:
+                self.pgbouncers = []
+
+        return self.pgbouncers
+
+    def read(self, filepath):
+        stream = False
+
+        # Setup environment variables replacement
+        def env_var_replacer(loader, node):
+            value                         = loader.construct_scalar(node)
+            beforePart, envVar, afterPart = ENV_VAR_REPLACER_PATTERN.match(value).groups()
+
+            if envVar in os.environ:
+                return beforePart + os.environ[envVar] + afterPart
+            else:
+                return beforePart + envVar + afterPart
+
+        yaml.add_implicit_resolver ("!envvarreplacer", ENV_VAR_REPLACER_PATTERN)
+        yaml.add_constructor('!envvarreplacer', env_var_replacer)
+
+        # Read file
+        try:
+            stream      = open(filepath, "r")
+            self.config = yaml.load(stream)
+        finally:
+            if stream:
+                stream.close()
+
+
+class PgbouncerConfig():
+    def __init__(self, config):
+        self.config = config
+        self.labels = False
+
+    def getDsn(self):
+        return self.config["dsn"] if "dsn" in self.config else "postgresql://pgbouncer:@localhost:6431/pgbouncer"
+
+    # TODO test me
+    def getDnsWithMaskedPassword(self):
+        match = DSN_PASSWORD_MASK_PATTERN.match(self.getDsn())
+        if match:
+            return match.group(1) + "***" + match.group(3)
+        else:
+            return self.getDsn()
+
+    def getConnectTimeout(self):
+        return self.config["connect_timeout"] if "connect_timeout" in self.config else 5
+
+    def getIncludeDatabases(self):
+        return self.config["include_databases"] if "include_databases" in self.config else []
+
+    def getExcludeDatabases(self):
+        return self.config["exclude_databases"] if "exclude_databases" in self.config else []
+
+    def getExtraLabels(self):
+        # Lazy instance extra labels
+        if self.labels is False:
+            if "extra_labels" in self.config:
+                self.labels = { item["name"]: str(item["value"]) for item in self.config["extra_labels"] }
+            else:
+                self.labels = {}
+
+        return self.labels

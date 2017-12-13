@@ -1,0 +1,2 @@
+# Prometheus exporter for PgBouncer
+

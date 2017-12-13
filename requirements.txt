@@ -1,0 +1,4 @@
+psycopg2==2.7.3.2
+prometheus_client==0.0.21
+python-json-logger==0.1.5
+pycodestyle

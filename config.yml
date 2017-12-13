@@ -1,0 +1,33 @@
+exporter_host: 0.0.0.0
+exporter_port: 9100
+
+pgbouncers:
+  -
+    # The pgbouncer connection string
+    dsn: postgresql://pgbouncer-exporter:$(PGBOUNCER_EXPORTER_PASS)@localhost:6431/pgbouncer
+
+    # The pgbouncer connection timeout in seconds.
+    connect_timeout: 5
+
+    # Databases to report metrics for. If omitted or empty, all databases
+    # will be reported.
+    include_databases:
+
+    # Databases to exclude from metrics reporting. If omitted or empty, all
+    # databases matching "include_databases" will be reported.
+    exclude_databases:
+      - pgbouncer
+
+    # Extra labels to add to all metrics exported for this pgbouncer
+    # instance. Required if you have configured multiple pgbouncers,
+    # in order to export an unique set of metrics.
+    extra_labels:
+      - name:  cluster
+        value: 1
+
+  - dsn: postgresql://pgbouncer-exporter:$(PGBOUNCER_EXPORTER_PASS)@localhost:6432/pgbouncer
+    exclude_databases:
+      - pgbouncer
+    extra_labels:
+      - name:  cluster
+        value: 2
