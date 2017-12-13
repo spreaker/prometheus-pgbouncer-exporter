@@ -57,6 +57,49 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(config.getPgbouncers()[1].getExcludeDatabases(), [])
         self.assertEqual(config.getPgbouncers()[1].getExtraLabels(), {})
 
+    def testShouldInjectEnvironmentVariablesOnParsing(self):
+        os.environ["TEST_USERNAME"] = "marco"
+        os.environ["TEST_PASSWORD"] = "secret"
+        os.environ["TEST_INCLUDE_DATABASE"] = "production"
+        os.environ["TEST_EXTRA_LABEL_NAME"] = "cluster"
+        os.environ["TEST_EXTRA_LABEL_VALUE"] = "users-1-1000"
+
+        config = Config()
+        config.read(f"{CURR_DIR}/fixtures/config-with-env-vars.yml")
+
+        self.assertEqual(len(config.getPgbouncers()), 1)
+        self.assertEqual(config.getPgbouncers()[0].getDsn(), "postgresql://marco:secret@host:6431/pgbouncer")
+        self.assertEqual(config.getPgbouncers()[0].getIncludeDatabases(), ["production"])
+        self.assertEqual(config.getPgbouncers()[0].getExtraLabels(), {"cluster": "users-1-1000"})
+
+    def testShouldInjectEnvironmentVariablesOnParsingEvenIfEmpty(self):
+        os.environ["TEST_USERNAME"] = "marco"
+        os.environ["TEST_PASSWORD"] = ""
+        os.environ["TEST_INCLUDE_DATABASE"] = "production"
+        os.environ["TEST_EXTRA_LABEL_NAME"] = "cluster"
+        os.environ["TEST_EXTRA_LABEL_VALUE"] = "users-1-1000"
+
+        config = Config()
+        config.read(f"{CURR_DIR}/fixtures/config-with-env-vars.yml")
+
+        self.assertEqual(len(config.getPgbouncers()), 1)
+        self.assertEqual(config.getPgbouncers()[0].getDsn(), "postgresql://marco:@host:6431/pgbouncer")
+
+    def testShouldKeepOriginalConfigOnMissingEnvironmentVariables(self):
+        del os.environ["TEST_USERNAME"]
+        os.environ["TEST_PASSWORD"] = "secret"
+        del os.environ["TEST_INCLUDE_DATABASE"]
+        os.environ["TEST_EXTRA_LABEL_NAME"] = "cluster"
+        os.environ["TEST_EXTRA_LABEL_VALUE"] = "users-1-1000"
+
+        config = Config()
+        config.read(f"{CURR_DIR}/fixtures/config-with-env-vars.yml")
+
+        self.assertEqual(len(config.getPgbouncers()), 1)
+        self.assertEqual(config.getPgbouncers()[0].getDsn(), "postgresql://$(TEST_USERNAME):secret@host:6431/pgbouncer")
+        self.assertEqual(config.getPgbouncers()[0].getIncludeDatabases(), ["$(TEST_INCLUDE_DATABASE)"])
+        self.assertEqual(config.getPgbouncers()[0].getExtraLabels(), {"cluster": "users-1-1000"})
+
 
 if __name__ == '__main__':
     unittest.main()

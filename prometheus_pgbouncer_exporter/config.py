@@ -3,7 +3,8 @@ import os
 import re
 
 # Define the regex used to replace $(ENV_VAR) with ENV_VAR value
-ENV_VAR_REPLACER_PATTERN = re.compile(r'^(.*)\$\(([^\)]+)\)(.*)$')
+ENV_VAR_MATCHER_PATTERN = re.compile(r'^(.*)\$\(([^\)]+)\)(.*)$')
+ENV_VAR_REPLACER_PATTERN = re.compile(r'\$\(([^\)]+)\)')
 
 # Define the regex used to mask the password in the DSN
 DSN_PASSWORD_MASK_PATTERN = re.compile(r'^(.*:)([^@]+)(@.*)$')
@@ -34,17 +35,16 @@ class Config():
         stream = False
 
         # Setup environment variables replacement
-        def env_var_replacer(loader, node):
+        def env_var_single_replace(match):
+            return os.environ[match.group(1)] if match.group(1) in os.environ else match.group()
+
+        def env_var_multi_replacer(loader, node):
             value = loader.construct_scalar(node)
-            beforePart, envVar, afterPart = ENV_VAR_REPLACER_PATTERN.match(value).groups()
 
-            if envVar in os.environ:
-                return beforePart + os.environ[envVar] + afterPart
-            else:
-                return beforePart + envVar + afterPart
+            return re.sub(ENV_VAR_REPLACER_PATTERN, env_var_single_replace, value)
 
-        yaml.add_implicit_resolver("!envvarreplacer", ENV_VAR_REPLACER_PATTERN)
-        yaml.add_constructor('!envvarreplacer', env_var_replacer)
+        yaml.add_implicit_resolver("!envvarreplacer", ENV_VAR_MATCHER_PATTERN)
+        yaml.add_constructor('!envvarreplacer', env_var_multi_replacer)
 
         # Read file
         try:
