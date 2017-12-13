@@ -1,12 +1,13 @@
 import psycopg2
 import logging
+from typing import List
 from psycopg2.extras import DictCursor
 from prometheus_client.core import CounterMetricFamily, GaugeMetricFamily
+from config import PgbouncerConfig
 
 
 class PgbouncersMetricsCollector():
-    # TODO force type
-    def __init__(self, configs):
+    def __init__(self, configs: List[PgbouncerConfig]):
         self.collectors = list(map(lambda config: PgbouncerMetricsCollector(config), configs))
 
     def collect(self):
@@ -35,8 +36,7 @@ class PgbouncersMetricsCollector():
 
 
 class PgbouncerMetricsCollector():
-    # TODO force type
-    def __init__(self, config):
+    def __init__(self, config: PgbouncerConfig):
         self.config = config
 
     def collect(self):
