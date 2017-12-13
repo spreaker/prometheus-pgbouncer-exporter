@@ -1,4 +1,4 @@
 dist
 MANIFEST
-prometheus_jenkins_exporter.egg-info
+prometheus_pgbouncer_exporter.egg-info
 __pycache__
