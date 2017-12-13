@@ -10,6 +10,13 @@ pip3 install prometheus-pgbouncer-exporter
 ```
 
 
+## How to run it
+
+The exporter accepts configuration via config file, you can specify with `--config` argument:
+
+`pgbouncer-exporter --config ./config.yml`
+
+
 ## Features
 
 - [Supports multiple pgbouncer instances](#why-supporting-multiple-pgbouncer-instances)
@@ -21,13 +28,6 @@ pip3 install prometheus-pgbouncer-exporter
 #### Why supporting multiple pgbouncer instances?
 
 PgBouncer is a single thread application and so can only saturate a single CPU core on high load. In high load environments, it's common practice to run multiple pgbouncer processes per machine (one for each CPU core) and load balance traffic among them. Ideally we want to run a single exporter instance per machine, capable to monitor 1+ pgbouncer(s) running on the machine itself.
-
-
-## How to run it
-
-The exporter accepts configuration via config file, you can specify with `--config` argument:
-
-`pgbouncer-exporter --config ./config.yml`
 
 
 ## Exported metrics
