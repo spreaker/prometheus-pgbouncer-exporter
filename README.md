@@ -16,6 +16,13 @@ The exporter accepts configuration via config file, you can specify with `--conf
 
 `pgbouncer-exporter --config ./config.yml`
 
+Available arguments:
+
+```
+--config CONFIG         Path to config file
+--log-level LOG_LEVEL   Minimum log level. Accepted values are: DEBUG, INFO, WARNING, ERROR, CRITICAL
+```
+
 
 ## Features
 
@@ -25,7 +32,7 @@ The exporter accepts configuration via config file, you can specify with `--conf
 - Allow to filter databases for which metrics are exported with `include_databases` and `exclude_databases`
 
 
-#### Why supporting multiple pgbouncer instances?
+### Why supporting multiple pgbouncer instances?
 
 PgBouncer is a single thread application and so can only saturate a single CPU core on high load. In high load environments, it's common practice to run multiple pgbouncer processes per machine (one for each CPU core) and load balance traffic among them. Ideally we want to run a single exporter instance per machine, capable to monitor 1+ pgbouncer(s) running on the machine itself.
 
@@ -49,6 +56,57 @@ The exporter exports the following metrics for each monitored pgbouncer instance
 | `pgbouncer_pools_server_login_connections`      | gauge    | Server connections currently in logging in process (labels: `database`, `user`) |
 | `pgbouncer_pools_client_maxwait_seconds`        | gauge    | How long the first (oldest) client in queue has waited, in seconds (labels: `database`, `user`) |
 
+
+## Configuration file
+
+The exporter read the configuration from a yaml config file with the following syntax:
+
+```yaml
+# The host on which the exporter should listen to (defaults to 127.0.0.1)
+exporter_host: 0.0.0.0
+
+# The port on which the exporter should listen to (defaults to 9100)
+exporter_port: 9100
+
+# The list of pgbouncer instances to monitor
+pgbouncers:
+  -
+    # The pgbouncer connection string. Supports environment variables replacement
+    # Ie. $(PGBOUNCER_PASS) is replaced with the content of "PGBOUNCER_PASS" environment
+    #     variable if exist, or left untouched if doesn't exist
+    dsn: postgresql://pgbouncer:$(PGBOUNCER_PASS)@localhost:6431/pgbouncer
+
+    # The pgbouncer connection timeout in seconds
+    connect_timeout: 5
+
+    # Databases to report metrics for. If omitted or empty, all databases
+    # will be reported.
+    include_databases:
+
+    # Databases to exclude from metrics reporting. If omitted or empty, all
+    # databases matching "include_databases" will be reported.
+    exclude_databases:
+      - pgbouncer
+
+    # Extra labels to add to all metrics exported for this pgbouncer
+    # instance. Required if you have configured multiple pgbouncers,
+    # in order to export an unique set of metrics.
+    extra_labels:
+      - name:  pool_id
+        value: 1
+
+  - dsn: postgresql://pgbouncer:$(PGBOUNCER_PASS)@localhost:6432/pgbouncer
+    exclude_databases:
+      - pgbouncer
+    extra_labels:
+      - name:  pool_id
+        value: 2
+```
+
+
+### Environment variables replacement
+
+The configuration file supports environment variables replacement. If you use the syntax `$(NAME)` in any setting value, it gets replaced by the content of `NAME` environment variable or left untouched if the `NAME` environment variable does not exist.
 
 
 ## Contributions

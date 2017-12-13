@@ -1,12 +1,18 @@
+# The host on which the exporter should listen to (defaults to 127.0.0.1)
 exporter_host: 0.0.0.0
+
+# The port on which the exporter should listen to (defaults to 9100)
 exporter_port: 9100
 
+# The list of pgbouncer instances to monitor
 pgbouncers:
   -
-    # The pgbouncer connection string
-    dsn: postgresql://pgbouncer-exporter:$(PGBOUNCER_EXPORTER_PASS)@localhost:6431/pgbouncer
+    # The pgbouncer connection string. Supports environment variables replacement
+    # Ie. $(PGBOUNCER_PASS) is replaced with the content of "PGBOUNCER_PASS" environment
+    #     variable if exist, or left untouched if doesn't exist
+    dsn: postgresql://pgbouncer:$(PGBOUNCER_PASS)@localhost:6431/pgbouncer
 
-    # The pgbouncer connection timeout in seconds.
+    # The pgbouncer connection timeout in seconds
     connect_timeout: 5
 
     # Databases to report metrics for. If omitted or empty, all databases
@@ -22,12 +28,12 @@ pgbouncers:
     # instance. Required if you have configured multiple pgbouncers,
     # in order to export an unique set of metrics.
     extra_labels:
-      - name:  cluster
+      - name:  pool_id
         value: 1
 
-  - dsn: postgresql://pgbouncer-exporter:$(PGBOUNCER_EXPORTER_PASS)@localhost:6432/pgbouncer
+  - dsn: postgresql://pgbouncer:$(PGBOUNCER_PASS)@localhost:6432/pgbouncer
     exclude_databases:
       - pgbouncer
     extra_labels:
-      - name:  cluster
+      - name:  pool_id
         value: 2
