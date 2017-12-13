@@ -123,20 +123,16 @@ class PgbouncerMetricsCollector():
 
     def _filterMetricsByIncludeDatabases(self, results, databases):
         # No filtering if empty
-        # TODO test me
         if not databases:
             return results
 
-        # TODO test me
         return list(filter(lambda item: item["database"] in databases, results))
 
     def _filterMetricsByExcludeDatabases(self, results, databases):
         # No filtering if empty
-        # TODO test me
         if not databases:
             return results
 
-        # TODO test me
         return list(filter(lambda item: item["database"] not in databases, results))
 
     def _fetchMetrics(self, conn, query):
@@ -147,13 +143,11 @@ class PgbouncerMetricsCollector():
             cursor = conn.cursor(cursor_factory=DictCursor)
 
             # Fetch statistics
-            # TODO query timeout
             cursor.execute(query)
 
             return cursor.fetchall()
         except Exception as error:
-            # TODO log
-            print(f"{str(error)}")
+            logging.getLogger().debug(f"Unable run query {query} on {self.config.getDsnWithMaskedPassword()}", extra={"exception": str(error)})
 
             return False
         finally:
