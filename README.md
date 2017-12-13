@@ -121,6 +121,12 @@ The configuration file supports environment variables replacement. If you use th
 
 `pycodestyle --max-line-length=300 prometheus_pgbouncer_exporter/*.py`
 
+### How to publish a new version
+
+1. [Release new version on GitHub](https://github.com/spreaker/prometheus-pgbouncer-exporter/releases)
+2. Update version in `setup.py`
+3. Run `python3 setup.py sdist upload -r pypi`
+
 
 ## License
 
