@@ -28,12 +28,10 @@ pgbouncers:
     # instance. Required if you have configured multiple pgbouncers,
     # in order to export an unique set of metrics.
     extra_labels:
-      - name:  pool_id
-        value: 1
+      pool_id: 1
 
   - dsn: postgresql://pgbouncer:$(PGBOUNCER_PASS)@localhost:6432/pgbouncer
     exclude_databases:
       - pgbouncer
     extra_labels:
-      - name:  pool_id
-        value: 2
+      pool_id: 2

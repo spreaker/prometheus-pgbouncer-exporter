@@ -92,15 +92,13 @@ pgbouncers:
     # instance. Required if you have configured multiple pgbouncers,
     # in order to export an unique set of metrics.
     extra_labels:
-      - name:  pool_id
-        value: 1
+      pool_id: 1
 
   - dsn: postgresql://pgbouncer:$(PGBOUNCER_PASS)@localhost:6432/pgbouncer
     exclude_databases:
       - pgbouncer
     extra_labels:
-      - name:  pool_id
-        value: 2
+      pool_id: 2
 ```
 
 
@@ -114,6 +112,11 @@ The configuration file supports environment variables replacement. If you use th
 ### Ensure the code is PEP 8 compliant
 
 `pycodestyle --max-line-length=300 prometheus_pgbouncer_exporter/*.py`
+
+
+### Run tests
+
+`python3 -m unittest`
 
 
 ## License

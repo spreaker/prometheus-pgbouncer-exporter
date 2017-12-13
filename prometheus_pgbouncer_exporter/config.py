@@ -18,10 +18,7 @@ class Config():
         return self.config["exporter_host"] if "exporter_host" in self.config else "127.0.0.1"
 
     def getExporterPort(self):
-        return self.config["exporter_port"] if "exporter_port" in self.config else "9100"
-
-    def getExporterPath(self):
-        return self.config["exporter_path"] if "exporter_path" in self.config else "/metrics"
+        return self.config["exporter_port"] if "exporter_port" in self.config else 9100
 
     def getPgbouncers(self):
         # Lazy instance pgbouncer config
@@ -53,6 +50,10 @@ class Config():
         try:
             stream = open(filepath, "r")
             self.config = yaml.load(stream)
+
+            # Handle an empty configuration file
+            if not self.config:
+                self.config = {}
         finally:
             if stream:
                 stream.close()
@@ -87,7 +88,7 @@ class PgbouncerConfig():
         # Lazy instance extra labels
         if self.labels is False:
             if "extra_labels" in self.config:
-                self.labels = {item["name"]: str(item["value"]) for item in self.config["extra_labels"]}
+                self.labels = {key: str(value) for key, value in self.config["extra_labels"].items()}
             else:
                 self.labels = {}
 
