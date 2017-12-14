@@ -1,5 +1,8 @@
 from setuptools import setup
 
+if sys.version_info.major < 3:
+    raise RuntimeError('Installing requires Python 3 or newer')
+
 setup(
   name             = 'prometheus-pgbouncer-exporter',
   packages         = ['prometheus_pgbouncer_exporter'],
