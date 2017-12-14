@@ -1,3 +1,4 @@
+import sys
 from setuptools import setup
 
 if sys.version_info.major < 3:
