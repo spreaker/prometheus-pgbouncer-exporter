@@ -53,6 +53,13 @@ def main():
         logging.getLogger().fatal("Unable to read config file from {file}".format(file=args.config), extra={"exception": str(error)})
         sys.exit(1)
 
+    # Validate config
+    try:
+        config.validate()
+    except Exception as error:
+        logging.getLogger().fatal("The config file {file} is invalid: {error}".format(file=args.config,error=str(error)))
+        sys.exit(1)
+
     # Register our custom collector
     REGISTRY.register(PgbouncersMetricsCollector(config.getPgbouncers()))
 

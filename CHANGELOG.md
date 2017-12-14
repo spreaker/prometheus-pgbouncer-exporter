@@ -1,5 +1,7 @@
 # Changelog
 
+- Added config file validation
+
 ### 0.1.2 (2017-12-14)
 
 - Ensure the `prometheus-pgbouncer-exporter` package is installed on Python >= 3

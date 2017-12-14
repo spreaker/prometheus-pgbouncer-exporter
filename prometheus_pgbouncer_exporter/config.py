@@ -11,8 +11,8 @@ DSN_PASSWORD_MASK_PATTERN = re.compile(r'^(.*:)([^@]+)(@.*)$')
 
 
 class Config():
-    def __init__(self):
-        self.config = {}
+    def __init__(self, config = {}):
+        self.config = config
         self.pgbouncers = False
 
     def getExporterHost(self):
@@ -58,6 +58,28 @@ class Config():
             if stream:
                 stream.close()
 
+    def validate(self):
+        """
+        Validate the configuration. Throws an exception with the error message in case
+        of invalid config, or just pass on success.
+        """
+
+        # Ensure there's at least 1 pgbouncer configured
+        if len(self.getPgbouncers()) == 0:
+            raise Exception("There is no pgbouncer instance configured. At least 1 pgbouncer instance is required to have something to monitor.")
+
+        # Validate all pgbouncers config
+        for pgbouncerConfig in self.getPgbouncers():
+            pgbouncerConfig.validate()
+
+        # Ensure all pgbouncers extra labels are unique, on multiple pgbouncers
+        if len(self.getPgbouncers()) > 1:
+            labels = list(map(lambda item: item.getExtraLabels(), self.getPgbouncers()))
+            duplicates = list(filter(lambda item: labels.count(item) > 1, labels))
+
+            if duplicates or not labels:
+                raise Exception("The extra_labels configured for each pgbouncer must be unique otherwise the exporter will export the same metric 2+ times with the same set of labels and then Prometheus will not ingest all metrics")
+
 
 class PgbouncerConfig():
     def __init__(self, config):
@@ -92,3 +114,13 @@ class PgbouncerConfig():
                 self.labels = {}
 
         return self.labels
+
+    def validate(self):
+        """
+        Validate the configuration. Throws an exception with the error message in case
+        of invalid config, or just pass on success.
+        """
+
+        # Check DSN
+        if not self.getDsn():
+            raise Exception("The DSN is required")
