@@ -11,7 +11,7 @@ DSN_PASSWORD_MASK_PATTERN = re.compile(r'^(.*:)([^@]+)(@.*)$')
 
 
 class Config():
-    def __init__(self, config = {}):
+    def __init__(self, config={}):
         self.config = config
         self.pgbouncers = False
 

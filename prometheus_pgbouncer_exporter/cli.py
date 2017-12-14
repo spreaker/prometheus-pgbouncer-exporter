@@ -20,7 +20,6 @@ def main():
     parser.add_argument("--log-file",   help="Path to log file or 'stdout' to log on console. Signal with -HUP to re-open log file descriptor", default="stdout")
     args = parser.parse_args()
 
-
     # Init logger
     logHandler = logging.FileHandler(args.log_file) if args.log_file is not "stdout" else logging.StreamHandler()
     formatter = jsonlogger.JsonFormatter("(asctime) (levelname) (message)", datefmt="%Y-%m-%d %H:%M:%S")
@@ -58,7 +57,7 @@ def main():
     try:
         config.validate()
     except Exception as error:
-        logging.getLogger().fatal("The config file {file} is invalid: {error}".format(file=args.config,error=str(error)))
+        logging.getLogger().fatal("The config file {file} is invalid: {error}".format(file=args.config, error=str(error)))
         sys.exit(1)
 
     # Register our custom collector
