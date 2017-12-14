@@ -1,5 +1,6 @@
 # Changelog
 
+### 0.2.0 (2017-12-14)
 - Added config file validation
 - Added `--log-file` cli argument support and handle of `kill -HUP` to re-open the log file description (useful in combination with logrotate)
 
