@@ -10,39 +10,40 @@ from .config import Config
 from .collector import PgbouncersMetricsCollector
 
 
-class SignalHandler():
-    def __init__(self):
-        self.shutdown = False
-
-        # Register signal handler
-        signal.signal(signal.SIGINT, self._on_signal_received)
-        signal.signal(signal.SIGTERM, self._on_signal_received)
-
-    def is_shutting_down(self):
-        return self.shutdown
-
-    def _on_signal_received(self, signal, frame):
-        logging.getLogger().info("Exporter is shutting down")
-        self.shutdown = True
-
-
 def main():
+    shutdown = False
+
     # Parse arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("--config",     help="Path to config file", default="config.yml")
     parser.add_argument("--log-level",  help="Minimum log level. Accepted values are: DEBUG, INFO, WARNING, ERROR, CRITICAL", default="INFO")
+    parser.add_argument("--log-file",   help="Path to log file or 'stdout' to log on console. Signal with -HUP to re-open log file descriptor", default="stdout")
     args = parser.parse_args()
 
-    # Register signal handler
-    signal_handler = SignalHandler()
 
     # Init logger
-    logHandler = logging.StreamHandler()
+    logHandler = logging.FileHandler(args.log_file) if args.log_file is not "stdout" else logging.StreamHandler()
     formatter = jsonlogger.JsonFormatter("(asctime) (levelname) (message)", datefmt="%Y-%m-%d %H:%M:%S")
     logHandler.setFormatter(formatter)
     logging.getLogger().addHandler(logHandler)
     logging.getLogger().setLevel(args.log_level)
     logging.getLogger().info("Exporter is starting up")
+
+    # Register signal handler
+    def _on_sighup(signal, frame):
+        if args.log_file is not "stdout":
+            logging.getLogger().info("Received SIGHUP - log file is closing")
+            logHandler.close()
+            logging.getLogger().info("Received SIGHUP - log file has been re-opened")
+
+    def _on_sigterm(signal, frame):
+        logging.getLogger().info("Exporter is shutting down")
+        nonlocal shutdown
+        shutdown = True
+
+    signal.signal(signal.SIGHUP, _on_sighup)
+    signal.signal(signal.SIGINT, _on_sigterm)
+    signal.signal(signal.SIGTERM, _on_sigterm)
 
     # Read config file
     config = Config()
@@ -67,7 +68,7 @@ def main():
     start_http_server(config.getExporterPort(), config.getExporterHost())
     logging.getLogger().info("Exporter listening on {host}:{port}".format(host=config.getExporterHost(), port=config.getExporterPort()))
 
-    while not signal_handler.is_shutting_down():
+    while not shutdown:
         time.sleep(1)
 
     logging.getLogger().info("Exporter has shutdown")

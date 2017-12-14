@@ -20,7 +20,10 @@ Available arguments:
 
 ```
 --config CONFIG         Path to config file
---log-level LOG_LEVEL   Minimum log level. Accepted values are: DEBUG, INFO, WARNING, ERROR, CRITICAL
+--log-level LOG_LEVEL   Minimum log level. Accepted values are: DEBUG, INFO,
+                        WARNING, ERROR, CRITICAL
+--log-file LOG_FILE     Path to log file or 'stdout' to log on console. Signal
+                        with -HUP to re-open log file descriptor
 ```
 
 
