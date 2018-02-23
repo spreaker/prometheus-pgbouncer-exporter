@@ -1,5 +1,8 @@
 # Changelog
 
+### 0.2.1 (2018-02-23)
+- [#1](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/1) - Log connection or scrape failures as errors, not debug
+
 ### 0.2.0 (2017-12-14)
 - Added config file validation
 - Added `--log-file` cli argument support and handle of `kill -HUP` to re-open the log file description (useful in combination with logrotate)
