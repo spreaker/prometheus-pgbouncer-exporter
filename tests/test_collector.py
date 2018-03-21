@@ -21,6 +21,11 @@ def fetchMetricsSuccessMock(conn, query):
             {"database": "test", "user": "marco", "cl_active": 1, "cl_waiting": 2, "sv_active": 3, "sv_idle": 4, "sv_used": 5, "sv_tested": 6, "sv_login": 7, "maxwait": 8 },
             {"database": "prod", "user": "marco", "cl_active": 8, "cl_waiting": 7, "sv_active": 6, "sv_idle": 5, "sv_used": 4, "sv_tested": 3, "sv_login": 2, "maxwait": 1 }
         ]
+    elif query == "SHOW DATABASES":
+        return [
+            {"name": "testpool", "database": "test", "pool_size": 50, "reserve_pool": 10, "current_connections": 30 },
+            {"name": "prodpool", "database": "prod", "pool_size": 90, "reserve_pool": 20, "current_connections": 75 }
+        ]
     else:
         return False
 
@@ -34,6 +39,8 @@ def fetchMetricsPartialFailureMock(conn, query):
             {"database": "prod", "total_requests": 4, "total_query_time": 3, "total_received": 2, "total_sent": 1}
         ]
     elif query == "SHOW POOLS":
+        raise Exception("Error while fetching metrics")
+    elif query == "SHOW DATABASES":
         raise Exception("Error while fetching metrics")
     else:
         return False
