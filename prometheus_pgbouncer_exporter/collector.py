@@ -86,9 +86,9 @@ class PgbouncerMetricsCollector():
                 results = self._filterMetricsByIncludeDatabases(results, self.config.getIncludeDatabases())
                 results = self._filterMetricsByExcludeDatabases(results, self.config.getExcludeDatabases())
                 metrics += self._exportMetrics(results, "pgbouncer_databases_", [
-                    {"type": "gauge", "column": "pool_size",           "metric": "database_pool_size",          "help": "Configured Pool Size Limit"},
-                    {"type": "gauge", "column": "reserve_pool",        "metric": "database_reserve_pool",       "help": "Configured Reserve Limit"},
-                    {"type": "gauge", "column": "current_connections", "metric": "database_current_connection", "help": "Database connection count"},
+                    {"type": "gauge", "column": "pool_size",           "metric": "database_pool_size",           "help": "Configured Pool Size Limit"},
+                    {"type": "gauge", "column": "reserve_pool",        "metric": "database_reserve_pool_size",   "help": "Configured Reserve Limit"},
+                    {"type": "gauge", "column": "current_connections", "metric": "database_current_connections", "help": "Database connection count"},
                 ], ["name", "database"], self.config.getExtraLabels())
             else:
                 success = False
