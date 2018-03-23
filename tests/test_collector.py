@@ -94,6 +94,39 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         self.assertEqual(metrics[0]["value"], 0)
         self.assertEqual(metrics[0]["labels"], {})
 
+    def testShouldExportDatabasesMetrics(self):
+        config = PgbouncerConfig({})
+        collector = PgbouncerMetricsCollector(config)
+        collector._createConnection = MagicMock(return_value=False)
+        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessMock)
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_databases_database_pool_size")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "gauge")
+        self.assertEqual(metrics[0]["value"], 50)
+        self.assertEqual(metrics[0]["labels"], {"database":"testpool"})
+        self.assertEqual(metrics[1]["type"], "gauge")
+        self.assertEqual(metrics[1]["value"], 90)
+        self.assertEqual(metrics[1]["labels"], {"database":"prodpool"})
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_databases_database_reserve_pool_size")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "gauge")
+        self.assertEqual(metrics[0]["value"], 10)
+        self.assertEqual(metrics[0]["labels"], {"database":"testpool"})
+        self.assertEqual(metrics[1]["type"], "gauge")
+        self.assertEqual(metrics[1]["value"], 20)
+        self.assertEqual(metrics[1]["labels"], {"database":"prodpool"})
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_databases_database_current_connections")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "gauge")
+        self.assertEqual(metrics[0]["value"], 30)
+        self.assertEqual(metrics[0]["labels"], {"database":"testpool"})
+        self.assertEqual(metrics[1]["type"], "gauge")
+        self.assertEqual(metrics[1]["value"], 75)
+        self.assertEqual(metrics[1]["labels"], {"database":"prodpool"})
+
     #
     # Databases filtering
     #
