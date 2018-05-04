@@ -80,6 +80,19 @@ class PgbouncerMetricsCollector():
             else:
                 success = False
 
+            # SHOW DATABASES
+            results = self._fetchMetrics(conn, "SHOW DATABASES")
+            if results:
+                results = self._filterMetricsByIncludeDatabases(results, self.config.getIncludeDatabases())
+                results = self._filterMetricsByExcludeDatabases(results, self.config.getExcludeDatabases())
+                metrics += self._exportMetrics(results, "pgbouncer_databases_", [
+                    {"type": "gauge", "column": "pool_size",           "metric": "database_pool_size",           "help": "Configured Pool Size Limit"},
+                    {"type": "gauge", "column": "reserve_pool",        "metric": "database_reserve_pool_size",   "help": "Configured Reserve Limit"},
+                    {"type": "gauge", "column": "current_connections", "metric": "database_current_connections", "help": "Database connection count"},
+                ], ["name", "database"], self.config.getExtraLabels())
+            else:
+                success = False
+
         except Exception as error:
             logging.getLogger().error("Unable fetch metrics from {dsn}".format(dsn=self.config.getDsnWithMaskedPassword()), extra={"exception": str(error)})
 
