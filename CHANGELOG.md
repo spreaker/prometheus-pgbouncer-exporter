@@ -1,8 +1,8 @@
 # Changelog
 
-- Fixed `PyYAML` dependency declaration [#4](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/4)
-- Added `pgbouncer_databases_database_pool_size`, `pgbouncer_databases_database_reserve_pool_size` and `pgbouncer_databases_database_current_connections` metrics [#3](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/3)
-
+- [FEATURE] Added `pgbouncer_databases_database_pool_size`, `pgbouncer_databases_database_reserve_pool_size` and `pgbouncer_databases_database_current_connections` metrics [#3](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/3)
+- [BUGFIX] Fixed `PyYAML` dependency declaration [#4](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/4)
+- [BUGFIX] Ensure the exporter immediately exit on SIGTERM
 
 ### 0.2.1 (2018-02-23)
 - [#1](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/1) - Log connection or scrape failures as errors, not debug
