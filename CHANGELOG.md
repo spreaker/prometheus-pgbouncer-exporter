@@ -1,5 +1,7 @@
 # Changelog
 
+- Fixed `PyYAML` dependency declaration [#4](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/4)
+
 ### 0.2.1 (2018-02-23)
 - [#1](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/1) - Log connection or scrape failures as errors, not debug
 
