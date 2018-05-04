@@ -58,9 +58,9 @@ The exporter exports the following metrics for each monitored pgbouncer instance
 | `pgbouncer_pools_server_testing_connections`       | gauge    | Server connections that are currently running either server_reset_query or server_check_query (labels: `database`, `user`) |
 | `pgbouncer_pools_server_login_connections`         | gauge    | Server connections currently in logging in process (labels: `database`, `user`) |
 | `pgbouncer_pools_client_maxwait_seconds`           | gauge    | How long the first (oldest) client in queue has waited, in seconds (labels: `database`, `user`) |
-| `pgbouncer_databases_database_pool_size`           | gauge    | Configured pool size limit (labels: `database`, `name`) |
-| `pgbouncer_databases_database_reserve_pool`        | gauge    | Configured reserve limit (labels: `database`, `name`) |
-| `pgbouncer_databases_database_current_connections` | gauge    | Database connection count (labels: `database`, `name`) |
+| `pgbouncer_databases_database_pool_size`           | gauge    | Configured pool size limit (labels: `database`, `backend_database`) |
+| `pgbouncer_databases_database_reserve_pool_size`   | gauge    | Configured reserve limit (labels: `database`, `backend_database`) |
+| `pgbouncer_databases_database_current_connections` | gauge    | Total number of per-database Database connections count (labels: `database`, `backend_database`) |
 
 ## Configuration file
 

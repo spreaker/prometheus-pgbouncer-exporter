@@ -58,7 +58,7 @@ class PgbouncerMetricsCollector():
                     {"type": "counter", "column": "total_query_time", "metric": "queries_duration_microseconds", "help": "Total number of microseconds spent by pgbouncer when actively connected to PostgreSQL"},
                     {"type": "counter", "column": "total_received",   "metric": "received_bytes_total",          "help": "Total volume in bytes of network traffic received by pgbouncer"},
                     {"type": "counter", "column": "total_sent",       "metric": "sent_bytes_total",              "help": "Total volume in bytes of network traffic sent by pgbouncer"},
-                ], ["database"], self.config.getExtraLabels())
+                ], {"database": "database"}, self.config.getExtraLabels())
             else:
                 success = False
 
@@ -76,7 +76,7 @@ class PgbouncerMetricsCollector():
                     {"type": "gauge", "column": "sv_tested",  "metric": "server_testing_connections",  "help": "Server connections that are currently running either server_reset_query or server_check_query"},
                     {"type": "gauge", "column": "sv_login",   "metric": "server_login_connections",    "help": "Server connections currently in logging in process"},
                     {"type": "gauge", "column": "maxwait",    "metric": "client_maxwait_seconds",      "help": "How long the first (oldest) client in queue has waited, in seconds"},
-                ], ["database", "user"], self.config.getExtraLabels())
+                ], {"database": "database", "user": "user"}, self.config.getExtraLabels())
             else:
                 success = False
 
@@ -89,7 +89,7 @@ class PgbouncerMetricsCollector():
                     {"type": "gauge", "column": "pool_size",           "metric": "database_pool_size",           "help": "Configured Pool Size Limit"},
                     {"type": "gauge", "column": "reserve_pool",        "metric": "database_reserve_pool_size",   "help": "Configured Reserve Limit"},
                     {"type": "gauge", "column": "current_connections", "metric": "database_current_connections", "help": "Database connection count"},
-                ], ["name", "database"], self.config.getExtraLabels())
+                ], {"name": "database", "database": "backend_database"}, self.config.getExtraLabels())
             else:
                 success = False
 
@@ -112,16 +112,16 @@ class PgbouncerMetricsCollector():
 
         return metrics
 
-    def _exportMetrics(self, results, metricPrefix, mappings, metricLabels, extraLabels):
+    def _exportMetrics(self, results, metricPrefix, metricMappings, labelMappings, extraLabels):
         metrics = []
 
         for result in results:
-            for mapping in mappings:
+            for mapping in metricMappings:
                 # Ensure the column exists
                 if not mapping["column"] in result:
                     continue
 
-                labels = {key: result[key] for key in metricLabels}
+                labels = {labelName: result[columnName] for columnName, labelName in labelMappings.items()}
                 labels.update(extraLabels)
 
                 metrics.append({
