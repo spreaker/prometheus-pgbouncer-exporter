@@ -1,5 +1,6 @@
 # Changelog
 
+### 1.0.0 (2018-05-04)
 - [FEATURE] Added `pgbouncer_databases_database_pool_size`, `pgbouncer_databases_database_reserve_pool_size` and `pgbouncer_databases_database_current_connections` metrics [#3](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/3)
 - [BUGFIX] Fixed `PyYAML` dependency declaration [#4](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/4)
 - [BUGFIX] Ensure the exporter immediately exit on SIGTERM
