@@ -3,6 +3,7 @@ import sys
 import signal
 import time
 import argparse
+import os
 from prometheus_client import start_http_server
 from prometheus_client.core import REGISTRY
 from pythonjsonlogger import jsonlogger
@@ -71,6 +72,8 @@ def main():
         time.sleep(1)
 
     logging.getLogger().info("Exporter has shutdown")
+
+    os._exit(0)
 
 
 if __name__ == '__main__':
