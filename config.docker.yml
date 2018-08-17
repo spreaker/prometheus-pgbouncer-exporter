@@ -1,0 +1,16 @@
+# The host on which the exporter should listen to (defaults to 127.0.0.1)
+exporter_host: $(PGBOUNCER_EXPORTER_HOST)
+
+# The port on which the exporter should listen to (defaults to 9127)
+exporter_port: $(PGBOUNCER_EXPORTER_PORT)
+
+# The list of pgbouncer instances to monitor
+pgbouncers:
+  -
+    # The pgbouncer connection string. Supports environment variables replacement
+    # Ie. $(PGBOUNCER_PASS) is replaced with the content of "PGBOUNCER_PASS" environment
+    #     variable if exist, or left untouched if doesn't exist
+    dsn: postgresql://$(PGBOUNCER_USER):$(PGBOUNCER_PASS)@$(PGBOUNCER_HOST):$(PGBOUNCER_PORT)/pgbouncer
+
+    # The pgbouncer connection timeout in seconds (defaults to 5 seconds)
+    connect_timeout: 5
