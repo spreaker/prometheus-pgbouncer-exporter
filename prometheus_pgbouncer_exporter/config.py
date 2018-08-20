@@ -19,7 +19,7 @@ class Config():
         return self.config["exporter_host"] if "exporter_host" in self.config else "127.0.0.1"
 
     def getExporterPort(self):
-        return self.config["exporter_port"] if "exporter_port" in self.config else 9100
+        return int(self.config["exporter_port"]) if "exporter_port" in self.config else 9100
 
     def getPgbouncers(self):
         # Lazy instance pgbouncer config
