@@ -46,10 +46,14 @@ The exporter exports the following metrics for each monitored pgbouncer instance
 
 | Metric name                                        | Type     | Description      |
 | -------------------------------------------------- | -------- | ---------------- |
-| `pgbouncer_stats_queries_total`                    | counter  | Total number of SQL queries pooled by pgbouncer (labels: `database`) |
-| `pgbouncer_stats_queries_duration_microseconds`    | counter  | Total number of microseconds spent by pgbouncer when actively connected to PostgreSQL (labels: `database`) |
+| `pgbouncer_stats_requests_total`                   | counter  | Total number of requests pooled. Could be transactions or queries, depending on pool mode. (labels: `database`, pgbouncer < 1.8) |
+| `pgbouncer_stats_queries_total`                    | counter  | Total number of SQL queries pooled by pgbouncer (labels: `database`, pgbouncer >= 1.8) |
+| `pgbouncer_stats_queries_duration_microseconds`    | counter  | Total number of microseconds spent waiting for a server to return a query response. Includes time spent waiting for an available connection. (labels: `database`, pgbouncer >= 1.8) |
+| `pgbouncer_stats_waiting_duration_microseconds`    | counter  | Total number of microseconds spent waiting for an available connection. (labels: `database`, pgbouncer >= 1.8) |
 | `pgbouncer_stats_received_bytes_total`             | counter  | Total volume in bytes of network traffic received by pgbouncer (labels: `database`) |
 | `pgbouncer_stats_sent_bytes_total`                 | counter  | Total volume in bytes of network traffic sent by pgbouncer (labels: `database`) |
+| `pgbouncer_stats_transactions_total`               | counter  | Total number of SQL transactions pooled by pgbouncer (labels: `database`, pgbouncer >= 1.8) |
+| `pgbouncer_stats_transactions_duration_microseconds`| counter | Total number of microseconds spent in a transaction. Includes time spent waiting for an available connection. (labels: `database`, pgbouncer >= 1.8) |
 | `pgbouncer_pools_client_active_connections`        | gauge    | Client connections that are linked to server connection and can process queries (labels: `database`, `user`) |
 | `pgbouncer_pools_client_waiting_connections`       | gauge    | Client connections have sent queries but have not yet got a server connection (labels: `database`, `user`) |
 | `pgbouncer_pools_server_active_connections`        | gauge    | Server connections that linked to client (labels: `database`, `user`) |
