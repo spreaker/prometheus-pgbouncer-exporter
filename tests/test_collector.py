@@ -10,7 +10,7 @@ from prometheus_pgbouncer_exporter.collector import *
 def getMetricsByName(metrics, name):
     return list(filter(lambda item: item["name"] == name, metrics))
 
-def fetchMetricsSuccessMock(conn, query):
+def fetchMetricsSuccessFromPgBouncer17Mock(conn, query):
     if query == "SHOW STATS":
         return [
             {"database": "test", "total_requests": 1, "total_query_time": 2, "total_received": 3, "total_sent": 4},
@@ -29,10 +29,26 @@ def fetchMetricsSuccessMock(conn, query):
     else:
         return False
 
-def fetchMetricsFailureMock(conn, query):
-    raise Exception("Error while fetching metrics")
+def fetchMetricsSuccessFromPgBouncer18Mock(conn, query):
+    if query == "SHOW STATS":
+        return [
+            {"database": "test", "total_query_count": 1, "total_xact_count": 2, "total_xact_time": 2, "total_wait_time": 1, "total_query_time": 2, "total_received": 3, "total_sent": 4},
+            {"database": "prod", "total_query_count": 4, "total_xact_count": 6, "total_xact_time": 3, "total_wait_time": 2, "total_query_time": 3, "total_received": 2, "total_sent": 1}
+        ]
+    elif query == "SHOW POOLS":
+        return [
+            {"database": "test", "user": "marco", "cl_active": 1, "cl_waiting": 2, "sv_active": 3, "sv_idle": 4, "sv_used": 5, "sv_tested": 6, "sv_login": 7, "maxwait": 8 },
+            {"database": "prod", "user": "marco", "cl_active": 8, "cl_waiting": 7, "sv_active": 6, "sv_idle": 5, "sv_used": 4, "sv_tested": 3, "sv_login": 2, "maxwait": 1 }
+        ]
+    elif query == "SHOW DATABASES":
+        return [
+            {"name": "test","database": "test", "pool_size": 50, "reserve_pool": 10, "current_connections": 30 },
+            {"name": "prod","database": "prod", "pool_size": 90, "reserve_pool": 20, "current_connections": 75 }
+        ]
+    else:
+        return False
 
-def fetchMetricsPartialFailureMock(conn, query):
+def fetchMetricsPartialFailureFromPgBouncer17Mock(conn, query):
     if query == "SHOW STATS":
         return [
             {"database": "test", "total_requests": 1, "total_query_time": 2, "total_received": 3, "total_sent": 4},
@@ -44,6 +60,9 @@ def fetchMetricsPartialFailureMock(conn, query):
         raise Exception("Error while fetching metrics")
     else:
         return False
+
+def fetchMetricsFailureMock(conn, query):
+    raise Exception("Error while fetching metrics")
 
 #
 # Tests
@@ -59,7 +78,7 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         config = PgbouncerConfig({})
         collector = PgbouncerMetricsCollector(config)
         collector._createConnection = MagicMock(return_value=False)
-        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessMock)
+        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessFromPgBouncer17Mock)
 
         metrics = getMetricsByName(collector.collect(), "pgbouncer_up")
 
@@ -85,7 +104,7 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         config = PgbouncerConfig({})
         collector = PgbouncerMetricsCollector(config)
         collector._createConnection = MagicMock(return_value=False)
-        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsPartialFailureMock)
+        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsPartialFailureFromPgBouncer17Mock)
 
         metrics = getMetricsByName(collector.collect(), "pgbouncer_up")
 
@@ -98,7 +117,7 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         config = PgbouncerConfig({})
         collector = PgbouncerMetricsCollector(config)
         collector._createConnection = MagicMock(return_value=False)
-        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessMock)
+        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessFromPgBouncer17Mock)
 
         metrics = getMetricsByName(collector.collect(), "pgbouncer_databases_database_pool_size")
         self.assertEqual(len(metrics), 2)
@@ -127,6 +146,126 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         self.assertEqual(metrics[1]["value"], 75)
         self.assertEqual(metrics[1]["labels"], {"backend_database":"prod", "database":"prod"})
 
+    def testShouldExportQueriesMetricsFromPgBouncer17(self):
+        config = PgbouncerConfig({})
+        collector = PgbouncerMetricsCollector(config)
+        collector._createConnection = MagicMock(return_value=False)
+        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessFromPgBouncer17Mock)
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_requests_total")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "counter")
+        self.assertEqual(metrics[0]["value"], 1)
+        self.assertEqual(metrics[0]["labels"], {"database":"test"})
+        self.assertEqual(metrics[1]["type"], "counter")
+        self.assertEqual(metrics[1]["value"], 4)
+        self.assertEqual(metrics[1]["labels"], {"database":"prod"})
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_queries_duration_microseconds")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "counter")
+        self.assertEqual(metrics[0]["value"], 2)
+        self.assertEqual(metrics[0]["labels"], {"database":"test"})
+        self.assertEqual(metrics[1]["type"], "counter")
+        self.assertEqual(metrics[1]["value"], 3)
+        self.assertEqual(metrics[1]["labels"], {"database":"prod"})
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_received_bytes_total")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "counter")
+        self.assertEqual(metrics[0]["value"], 3)
+        self.assertEqual(metrics[0]["labels"], {"database":"test"})
+        self.assertEqual(metrics[1]["type"], "counter")
+        self.assertEqual(metrics[1]["value"], 2)
+        self.assertEqual(metrics[1]["labels"], {"database":"prod"})
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_sent_bytes_total")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "counter")
+        self.assertEqual(metrics[0]["value"], 4)
+        self.assertEqual(metrics[0]["labels"], {"database":"test"})
+        self.assertEqual(metrics[1]["type"], "counter")
+        self.assertEqual(metrics[1]["value"], 1)
+        self.assertEqual(metrics[1]["labels"], {"database":"prod"})
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_queries_total")
+        self.assertEqual(len(metrics), 0)
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_transactions_total")
+        self.assertEqual(len(metrics), 0)
+
+    def testShouldExportQueriesMetricsFromPgBouncer18(self):
+        config = PgbouncerConfig({})
+        collector = PgbouncerMetricsCollector(config)
+        collector._createConnection = MagicMock(return_value=False)
+        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessFromPgBouncer18Mock)
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_queries_total")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "counter")
+        self.assertEqual(metrics[0]["value"], 1)
+        self.assertEqual(metrics[0]["labels"], {"database":"test"})
+        self.assertEqual(metrics[1]["type"], "counter")
+        self.assertEqual(metrics[1]["value"], 4)
+        self.assertEqual(metrics[1]["labels"], {"database":"prod"})
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_transactions_total")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "counter")
+        self.assertEqual(metrics[0]["value"], 2)
+        self.assertEqual(metrics[0]["labels"], {"database":"test"})
+        self.assertEqual(metrics[1]["type"], "counter")
+        self.assertEqual(metrics[1]["value"], 6)
+        self.assertEqual(metrics[1]["labels"], {"database":"prod"})
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_transactions_duration_microseconds")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "counter")
+        self.assertEqual(metrics[0]["value"], 2)
+        self.assertEqual(metrics[0]["labels"], {"database":"test"})
+        self.assertEqual(metrics[1]["type"], "counter")
+        self.assertEqual(metrics[1]["value"], 3)
+        self.assertEqual(metrics[1]["labels"], {"database":"prod"})
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_waiting_duration_microseconds")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "counter")
+        self.assertEqual(metrics[0]["value"], 1)
+        self.assertEqual(metrics[0]["labels"], {"database":"test"})
+        self.assertEqual(metrics[1]["type"], "counter")
+        self.assertEqual(metrics[1]["value"], 2)
+        self.assertEqual(metrics[1]["labels"], {"database":"prod"})
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_queries_duration_microseconds")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "counter")
+        self.assertEqual(metrics[0]["value"], 2)
+        self.assertEqual(metrics[0]["labels"], {"database":"test"})
+        self.assertEqual(metrics[1]["type"], "counter")
+        self.assertEqual(metrics[1]["value"], 3)
+        self.assertEqual(metrics[1]["labels"], {"database":"prod"})
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_received_bytes_total")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "counter")
+        self.assertEqual(metrics[0]["value"], 3)
+        self.assertEqual(metrics[0]["labels"], {"database":"test"})
+        self.assertEqual(metrics[1]["type"], "counter")
+        self.assertEqual(metrics[1]["value"], 2)
+        self.assertEqual(metrics[1]["labels"], {"database":"prod"})
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_sent_bytes_total")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "counter")
+        self.assertEqual(metrics[0]["value"], 4)
+        self.assertEqual(metrics[0]["labels"], {"database":"test"})
+        self.assertEqual(metrics[1]["type"], "counter")
+        self.assertEqual(metrics[1]["value"], 1)
+        self.assertEqual(metrics[1]["labels"], {"database":"prod"})
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_requests_total")
+        self.assertEqual(len(metrics), 0)
+
     #
     # Databases filtering
     #
@@ -135,9 +274,9 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         config = PgbouncerConfig({})
         collector = PgbouncerMetricsCollector(config)
         collector._createConnection = MagicMock(return_value=False)
-        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessMock)
+        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessFromPgBouncer17Mock)
 
-        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_queries_total")
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_requests_total")
         self.assertEqual(len(metrics), 2)
         self.assertEqual(metrics[0]["type"], "counter")
         self.assertEqual(metrics[0]["value"], 1)
@@ -159,9 +298,9 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         config = PgbouncerConfig({"include_databases":[]})
         collector = PgbouncerMetricsCollector(config)
         collector._createConnection = MagicMock(return_value=False)
-        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessMock)
+        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessFromPgBouncer17Mock)
 
-        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_queries_total")
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_requests_total")
         self.assertEqual(len(metrics), 2)
         self.assertEqual(metrics[0]["type"], "counter")
         self.assertEqual(metrics[0]["value"], 1)
@@ -183,9 +322,9 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         config = PgbouncerConfig({"include_databases": ["prod"]})
         collector = PgbouncerMetricsCollector(config)
         collector._createConnection = MagicMock(return_value=False)
-        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessMock)
+        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessFromPgBouncer17Mock)
 
-        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_queries_total")
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_requests_total")
         self.assertEqual(len(metrics), 1)
         self.assertEqual(metrics[0]["type"], "counter")
         self.assertEqual(metrics[0]["value"], 4)
@@ -201,9 +340,9 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         config = PgbouncerConfig({"exclude_databases": ["prod"]})
         collector = PgbouncerMetricsCollector(config)
         collector._createConnection = MagicMock(return_value=False)
-        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessMock)
+        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessFromPgBouncer17Mock)
 
-        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_queries_total")
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_requests_total")
         self.assertEqual(len(metrics), 1)
         self.assertEqual(metrics[0]["type"], "counter")
         self.assertEqual(metrics[0]["value"], 1)
@@ -223,9 +362,9 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         config = PgbouncerConfig({})
         collector = PgbouncerMetricsCollector(config)
         collector._createConnection = MagicMock(return_value=False)
-        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsPartialFailureMock)
+        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsPartialFailureFromPgBouncer17Mock)
 
-        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_queries_total")
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_requests_total")
         self.assertEqual(len(metrics), 2)
         self.assertEqual(metrics[0]["type"], "counter")
         self.assertEqual(metrics[0]["value"], 1)

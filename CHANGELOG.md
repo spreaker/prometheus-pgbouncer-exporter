@@ -1,5 +1,12 @@
 # Changelog
 
+- [BREAKING CHANGE] Renamed `pgbouncer_stats_queries_total` to `pgbouncer_stats_requests_total` on pgbouncer <= 1.7
+- [FEATURE] Added pgbouncer >= 1.8 support [#8](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/8) (thanks to [bitglue](https://github.com/bitglue)), including the following new metrics:
+    - `pgbouncer_stats_transactions_total`
+    - `pgbouncer_stats_queries_total`
+    - `pgbouncer_stats_transactions_duration_microseconds`
+    - `pgbouncer_stats_waiting_duration_microseconds`
+
 ### 1.0.1 (2018-08-30)
 - [BUGFIX] Fixed `PGBOUNCER_EXPORTER_PORT` environment variable data type [#7](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/7)
 
