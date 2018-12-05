@@ -117,19 +117,27 @@ pgbouncers:
 The configuration file supports environment variables replacement. If you use the syntax `$(NAME)` in any setting value, it gets replaced by the content of `NAME` environment variable or left untouched if the `NAME` environment variable does not exist.
 
 
-## Contributions
+## How to contribute
 
-### Run locally
+Run the **development environment**:
 
-`python3 -m prometheus_pgbouncer_exporter.cli --config ./config.yml`
+```
+docker-compose build && docker-compose run dev
+```
 
-### Run tests
+Then inside the container:
 
-`python3 -m unittest`
+```
+# Run tests
+python -m unittest
 
-### Ensure the code is PEP 8 compliant
+# Run exporter
+python -m prometheus_pgbouncer_exporter.cli --config ./config.yml
 
-`pycodestyle --max-line-length=300 prometheus_pgbouncer_exporter/*.py`
+# Run linter
+pycodestyle --max-line-length=300 prometheus_pgbouncer_exporter/*.py
+```
+
 
 ### How to publish a new version
 
