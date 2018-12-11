@@ -153,6 +153,14 @@ class TestConfig(unittest.TestCase):
 
 class TestPgbouncerConfig(unittest.TestCase):
 
+    def testGetDsnWithMaskedPasswordShouldReturnDsnWithThreeAsterisksInsteadOfThePassword(self):
+        config = PgbouncerConfig({"dsn": "postgresql://pgbouncer:secret@localhost:6431/pgbouncer"})
+        self.assertEqual(config.getDsnWithMaskedPassword(), "postgresql://pgbouncer:***@localhost:6431/pgbouncer")
+
+    def testGetDsnWithMaskedPasswordShouldWorkEvenIfThePasswordIsEmpty(self):
+        config = PgbouncerConfig({"dsn": "postgresql://pgbouncer:@localhost:6431/pgbouncer"})
+        self.assertEqual(config.getDsnWithMaskedPassword(), "postgresql://pgbouncer:***@localhost:6431/pgbouncer")
+
     def testValidateShouldPassOnConfigContainingOnlyDsn(self):
         config = PgbouncerConfig({"dsn": "postgresql://"})
         config.validate()

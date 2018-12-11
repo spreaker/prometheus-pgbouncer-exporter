@@ -7,7 +7,7 @@ ENV_VAR_MATCHER_PATTERN = re.compile(r'^(.*)\$\(([^\)]+)\)(.*)$')
 ENV_VAR_REPLACER_PATTERN = re.compile(r'\$\(([^\)]+)\)')
 
 # Define the regex used to mask the password in the DSN
-DSN_PASSWORD_MASK_PATTERN = re.compile(r'^(.*:)([^@]+)(@.*)$')
+DSN_PASSWORD_MASK_PATTERN = re.compile(r'^(.*:)([^@]*)(@.*)$')
 
 
 class Config():

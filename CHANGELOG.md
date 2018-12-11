@@ -1,5 +1,7 @@
 # Changelog
 
+- [BUGFIX] Correctly mask the DSN in logs when the password is empty
+
 ### 2.0.0 (2018-12-05)
 - [BREAKING CHANGE] Renamed `pgbouncer_stats_queries_total` to `pgbouncer_stats_requests_total` on pgbouncer <= 1.7
 - [FEATURE] Added pgbouncer >= 1.8 support [#8](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/8) (thanks to [bitglue](https://github.com/bitglue)), including the following new metrics:
