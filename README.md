@@ -1,16 +1,21 @@
 # Prometheus exporter for PgBouncer
 
 
-## How to install
+## How to use it
+
+You have two options to use it:
+
+1. Manually install and run the `prometheus-pgbouncer-exporter` Python package
+2. Use the [Docker image available on Docker hub](https://hub.docker.com/r/spreaker/prometheus-pgbouncer-exporter/) (_see instructions on Docker hub_)
+
+
+## How to manually install and run it
 
 The following will install the exporter whose entrypoint binary is called `pgbouncer-exporter`:
 
 ```
 pip3 install prometheus-pgbouncer-exporter
 ```
-
-
-## How to run it
 
 The exporter accepts configuration via config file, you can specify with `--config` argument:
 
@@ -141,9 +146,29 @@ pycodestyle --max-line-length=300 prometheus_pgbouncer_exporter/*.py
 
 ### How to publish a new version
 
-1. [Release new version on GitHub](https://github.com/spreaker/prometheus-pgbouncer-exporter/releases)
-2. Update version in `setup.py`
-3. Run `python3 setup.py sdist upload -r pypi`
+**Release python package**:
+
+1. Update version in `setup.py`
+2. Update `CHANGELOG.md`
+3. [Release new version on GitHub](https://github.com/spreaker/prometheus-pgbouncer-exporter/releases)
+4. Run `python3 setup.py sdist upload -r pypi`
+
+**Release Docker image**:
+
+1. Update package version in `Dockerfile`
+2. Build image
+   ```
+   docker rmi -f prometheus-pgbouncer-exporter && \
+   docker build -t prometheus-pgbouncer-exporter .
+   ```
+3. Tag the image and push it to Docker Hub
+   ```
+   docker tag prometheus-pgbouncer-exporter spreaker/prometheus-pgbouncer-exporter:latest && \
+   docker push spreaker/prometheus-pgbouncer-exporter:latest
+
+   docker tag prometheus-pgbouncer-exporter spreaker/prometheus-pgbouncer-exporter:2.0.1 && \
+   docker push spreaker/prometheus-pgbouncer-exporter:2.0.1
+   ```
 
 
 ## License
