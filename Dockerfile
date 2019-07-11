@@ -1,17 +1,14 @@
 FROM python:3.6.7-alpine
 
-RUN apk update && \
- apk add postgresql-libs && \
- apk add --virtual .build-deps gcc musl-dev postgresql-dev && \
- python3 -m pip install prometheus-pgbouncer-exporter==2.0.1 --no-cache-dir && \
- apk --purge del .build-deps
+ADD . /
 
-ENV PGBOUNCER_EXPORTER_HOST="127.0.0.1" \
-    PGBOUNCER_EXPORTER_PORT=9127 \
-    PGBOUNCER_USER="pgbouncer" \
-    PGBOUNCER_PASS="" \
-    PGBOUNCER_HOST="localhost" \
-    PGBOUNCER_PORT=6432
+RUN apk update
+RUN apk add curl
+RUN apk add nmap
+RUN apk add postgresql-libs
+RUN apk add --virtual .build-deps gcc musl-dev postgresql-dev
+RUN python3 -m pip install . --no-cache-dir --verbose
+RUN apk --purge del .build-deps
 
 EXPOSE 9127
 

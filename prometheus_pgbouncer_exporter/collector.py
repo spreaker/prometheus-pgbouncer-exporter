@@ -62,6 +62,13 @@ class PgbouncerMetricsCollector():
                     {"type": "counter", "column": "total_query_count", "metric": "queries_total",                      "help": "Total number of queries pooled"},
                     {"type": "counter", "column": "total_xact_time",   "metric": "transactions_duration_microseconds", "help": "Total number of microseconds spent in a transaction. Includes time spent waiting for an available connection."},
                     {"type": "counter", "column": "total_wait_time",   "metric": "waiting_duration_microseconds",      "help": "Total number of microseconds spent waiting for an available connection."},
+                    {"type": "counter", "column": "avg_xact_count",    "metric": "average_transactions_seconds",       "help": "Average transactions per second in last stat period."},
+                    {"type": "counter", "column": "avg_query_count",   "metric": "average_queries_seconds",            "help": "Average queries per second in last stat period."},
+                    {"type": "counter", "column": "avg_recv",          "metric": "average_client_bytes_received",      "help": "Average received (from clients) bytes per second."},
+                    {"type": "counter", "column": "avg_sent",          "metric": "average_client_bytes_sent",          "help": "Average sent (to clients) bytes per second."},
+                    {"type": "counter", "column": "avg_xact_time",     "metric": "average_transaction_duration",       "help": "Average transaction duration in microseconds."},
+                    {"type": "counter", "column": "avg_query_time",    "metric": "average_query_duration",             "help": "Average query duration in microseconds."},
+                    {"type": "counter", "column": "avg_wait_time",     "metric": "average_client_time_waiting",        "help": "Time spent by clients waiting for a server in microseconds (average per second)."},
 
                     # all versions
                     {"type": "counter", "column": "total_query_time",  "metric": "queries_duration_microseconds",      "help": "Total number of microseconds spent waiting for a server to return a query response. Includes time spent waiting for an available connection."},
@@ -78,14 +85,16 @@ class PgbouncerMetricsCollector():
                 results = self._filterMetricsByIncludeDatabases(results, self.config.getIncludeDatabases())
                 results = self._filterMetricsByExcludeDatabases(results, self.config.getExcludeDatabases())
                 metrics += self._exportMetrics(results, "pgbouncer_pools_", [
-                    {"type": "gauge", "column": "cl_active",  "metric": "client_active_connections",   "help": "Client connections that are linked to server connection and can process queries"},
-                    {"type": "gauge", "column": "cl_waiting", "metric": "client_waiting_connections",  "help": "Client connections have sent queries but have not yet got a server connection"},
-                    {"type": "gauge", "column": "sv_active",  "metric": "server_active_connections",   "help": "Server connections that linked to client"},
-                    {"type": "gauge", "column": "sv_idle",    "metric": "server_idle_connections",     "help": "Server connections that unused and immediately usable for client queries"},
-                    {"type": "gauge", "column": "sv_used",    "metric": "server_used_connections",     "help": "Server connections that have been idle more than server_check_delay, so they needs server_check_query to run on it before it can be used"},
-                    {"type": "gauge", "column": "sv_tested",  "metric": "server_testing_connections",  "help": "Server connections that are currently running either server_reset_query or server_check_query"},
-                    {"type": "gauge", "column": "sv_login",   "metric": "server_login_connections",    "help": "Server connections currently in logging in process"},
-                    {"type": "gauge", "column": "maxwait",    "metric": "client_maxwait_seconds",      "help": "How long the first (oldest) client in queue has waited, in seconds"},
+                    {"type": "gauge", "column": "cl_active",  "metric": "client_active_connections",      "help": "Client connections that are linked to server connection and can process queries"},
+                    {"type": "gauge", "column": "cl_waiting", "metric": "client_waiting_connections",     "help": "Client connections have sent queries but have not yet got a server connection"},
+                    {"type": "gauge", "column": "sv_active",  "metric": "server_active_connections",      "help": "Server connections that linked to client"},
+                    {"type": "gauge", "column": "sv_idle",    "metric": "server_idle_connections",        "help": "Server connections that unused and immediately usable for client queries"},
+                    {"type": "gauge", "column": "sv_used",    "metric": "server_used_connections",        "help": "Server connections that have been idle more than server_check_delay, so they needs server_check_query to run on it before it can be used"},
+                    {"type": "gauge", "column": "sv_tested",  "metric": "server_testing_connections",     "help": "Server connections that are currently running either server_reset_query or server_check_query"},
+                    {"type": "gauge", "column": "sv_login",   "metric": "server_login_connections",       "help": "Server connections currently in logging in process"},
+                    {"type": "gauge", "column": "maxwait",    "metric": "client_maxwait_seconds",         "help": "How long the first (oldest) client in queue has waited, in seconds"},
+                    {"type": "gauge", "column": "maxwait_us", "metric": "client_maxwait_us_microseconds", "help": "Microsecond part of the maximum waiting time."},
+                    {"type": "text",  "column": "pool_mode",  "metric": "client_pool_mode",               "help": "The pooling mode in use."},
                 ], {"database": "database", "user": "user"}, self.config.getExtraLabels())
             else:
                 success = False
@@ -96,9 +105,13 @@ class PgbouncerMetricsCollector():
                 results = self._filterMetricsByIncludeDatabases(results, self.config.getIncludeDatabases())
                 results = self._filterMetricsByExcludeDatabases(results, self.config.getExcludeDatabases())
                 metrics += self._exportMetrics(results, "pgbouncer_databases_", [
-                    {"type": "gauge", "column": "pool_size",           "metric": "database_pool_size",           "help": "Configured Pool Size Limit"},
-                    {"type": "gauge", "column": "reserve_pool",        "metric": "database_reserve_pool_size",   "help": "Configured Reserve Limit"},
-                    {"type": "gauge", "column": "current_connections", "metric": "database_current_connections", "help": "Database connection count"},
+                    {"type": "gauge",   "column": "pool_size",           "metric": "database_pool_size",           "help": "Configured Pool Size Limit"},
+                    {"type": "gauge",   "column": "reserve_pool",        "metric": "database_reserve_pool_size",   "help": "Configured Reserve Limit"},
+                    {"type": "gauge",   "column": "current_connections", "metric": "database_current_connections", "help": "Database connection count"},
+                    {"type": "counter", "column": "max_connections",     "metric": "database_max_connections",     "help": "Maximum number of allowed connections for this database, as set by max_db_connections, either globally or per database."},
+                    {"type": "gauge",   "column": "paused",              "metric": "database_paused",              "help": "1 if this database is currently paused, else 0."},
+                    {"type": "gauge",   "column": "disabled",            "metric": "database_disabled",            "help": "1 if this database is currently disabled, else 0."},
+                    {"type": "text",    "column": "pool_mode",           "metric": "database_pool_mode",           "help": "The database’s override pool_mode, or NULL if the default will be used instead."},
                 ], {"name": "database", "database": "backend_database"}, self.config.getExtraLabels())
             else:
                 success = False
