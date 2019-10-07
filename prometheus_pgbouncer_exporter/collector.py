@@ -86,6 +86,7 @@ class PgbouncerMetricsCollector():
                     {"type": "gauge", "column": "sv_tested",  "metric": "server_testing_connections",  "help": "Server connections that are currently running either server_reset_query or server_check_query"},
                     {"type": "gauge", "column": "sv_login",   "metric": "server_login_connections",    "help": "Server connections currently in logging in process"},
                     {"type": "gauge", "column": "maxwait",    "metric": "client_maxwait_seconds",      "help": "How long the first (oldest) client in queue has waited, in seconds"},
+                    {"type": "gauge", "column": "maxwait_us", "metric": "client_maxwait_microseconds", "help": "How long the first (oldest) client in queue has waited, in microseconds"},
                 ], {"database": "database", "user": "user"}, self.config.getExtraLabels())
             else:
                 success = False
