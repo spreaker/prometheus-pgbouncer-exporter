@@ -78,14 +78,14 @@ class PgbouncerMetricsCollector():
                 results = self._filterMetricsByIncludeDatabases(results, self.config.getIncludeDatabases())
                 results = self._filterMetricsByExcludeDatabases(results, self.config.getExcludeDatabases())
                 metrics += self._exportMetrics(results, "pgbouncer_pools_", [
-                    {"type": "gauge", "column": "cl_active",  "metric": "client_active_connections",   "help": "Client connections that are linked to server connection and can process queries"},
-                    {"type": "gauge", "column": "cl_waiting", "metric": "client_waiting_connections",  "help": "Client connections have sent queries but have not yet got a server connection"},
-                    {"type": "gauge", "column": "sv_active",  "metric": "server_active_connections",   "help": "Server connections that linked to client"},
-                    {"type": "gauge", "column": "sv_idle",    "metric": "server_idle_connections",     "help": "Server connections that unused and immediately usable for client queries"},
-                    {"type": "gauge", "column": "sv_used",    "metric": "server_used_connections",     "help": "Server connections that have been idle more than server_check_delay, so they needs server_check_query to run on it before it can be used"},
-                    {"type": "gauge", "column": "sv_tested",  "metric": "server_testing_connections",  "help": "Server connections that are currently running either server_reset_query or server_check_query"},
-                    {"type": "gauge", "column": "sv_login",   "metric": "server_login_connections",    "help": "Server connections currently in logging in process"},
-                    {"type": "gauge", "column": "maxwait",    "metric": "client_maxwait_seconds",      "help": "How long the first (oldest) client in queue has waited, in seconds"},
+                    {"type": "gauge", "column": "cl_active",              "metric": "client_active_connections",   "help": "Client connections that are linked to server connection and can process queries"},
+                    {"type": "gauge", "column": "cl_waiting",             "metric": "client_waiting_connections",  "help": "Client connections have sent queries but have not yet got a server connection"},
+                    {"type": "gauge", "column": "sv_active",              "metric": "server_active_connections",   "help": "Server connections that linked to client"},
+                    {"type": "gauge", "column": "sv_idle",                "metric": "server_idle_connections",     "help": "Server connections that unused and immediately usable for client queries"},
+                    {"type": "gauge", "column": "sv_used",                "metric": "server_used_connections",     "help": "Server connections that have been idle more than server_check_delay, so they needs server_check_query to run on it before it can be used"},
+                    {"type": "gauge", "column": "sv_tested",              "metric": "server_testing_connections",  "help": "Server connections that are currently running either server_reset_query or server_check_query"},
+                    {"type": "gauge", "column": "sv_login",               "metric": "server_login_connections",    "help": "Server connections currently in logging in process"},
+                    {"type": "gauge", "compute": compute_maxwait_seconds, "metric": "client_maxwait_seconds",      "help": "How long the first (oldest) client in queue has waited, in seconds"},
                 ], {"database": "database", "user": "user"}, self.config.getExtraLabels())
             else:
                 success = False
@@ -127,8 +127,14 @@ class PgbouncerMetricsCollector():
 
         for result in results:
             for mapping in metricMappings:
-                # Ensure the column exists
-                if not mapping["column"] in result:
+                if "compute" in mapping:
+                    try:
+                        value = mapping["compute"](result)
+                    except KeyError:
+                        continue
+                elif mapping["column"] in result:
+                    value = result[mapping["column"]]
+                else:
                     continue
 
                 labels = {labelName: result[columnName] for columnName, labelName in labelMappings.items()}
@@ -137,7 +143,7 @@ class PgbouncerMetricsCollector():
                 metrics.append({
                     "type":   mapping["type"],
                     "name":   metricPrefix + mapping['metric'],
-                    "value":  result[mapping["column"]],
+                    "value":  value,
                     "labels": labels,
                     "help":   mapping["help"]
                 })
@@ -182,3 +188,11 @@ class PgbouncerMetricsCollector():
         conn.set_session(autocommit=True)
 
         return conn
+
+
+def compute_maxwait_seconds(result):
+    """
+    Compute the maximum wait by summing `maxwait` with `maxwait_us` (microseconds)
+    so that we have higher precision on the maxwait seconds gauge
+    """
+    return result["maxwait"] + result["maxwait_us"] / 1000000.0

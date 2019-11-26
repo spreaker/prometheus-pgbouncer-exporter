@@ -18,8 +18,8 @@ def fetchMetricsSuccessFromPgBouncer17Mock(conn, query):
         ]
     elif query == "SHOW POOLS":
         return [
-            {"database": "test", "user": "marco", "cl_active": 1, "cl_waiting": 2, "sv_active": 3, "sv_idle": 4, "sv_used": 5, "sv_tested": 6, "sv_login": 7, "maxwait": 8 },
-            {"database": "prod", "user": "marco", "cl_active": 8, "cl_waiting": 7, "sv_active": 6, "sv_idle": 5, "sv_used": 4, "sv_tested": 3, "sv_login": 2, "maxwait": 1 }
+            {"database": "test", "user": "marco", "cl_active": 1, "cl_waiting": 2, "sv_active": 3, "sv_idle": 4, "sv_used": 5, "sv_tested": 6, "sv_login": 7, "maxwait": 8, "maxwait_us": 100000 },
+            {"database": "prod", "user": "marco", "cl_active": 8, "cl_waiting": 7, "sv_active": 6, "sv_idle": 5, "sv_used": 4, "sv_tested": 3, "sv_login": 2, "maxwait": 1, "maxwait_us": 200000 }
         ]
     elif query == "SHOW DATABASES":
         return [
@@ -37,8 +37,8 @@ def fetchMetricsSuccessFromPgBouncer18Mock(conn, query):
         ]
     elif query == "SHOW POOLS":
         return [
-            {"database": "test", "user": "marco", "cl_active": 1, "cl_waiting": 2, "sv_active": 3, "sv_idle": 4, "sv_used": 5, "sv_tested": 6, "sv_login": 7, "maxwait": 8 },
-            {"database": "prod", "user": "marco", "cl_active": 8, "cl_waiting": 7, "sv_active": 6, "sv_idle": 5, "sv_used": 4, "sv_tested": 3, "sv_login": 2, "maxwait": 1 }
+            {"database": "test", "user": "marco", "cl_active": 1, "cl_waiting": 2, "sv_active": 3, "sv_idle": 4, "sv_used": 5, "sv_tested": 6, "sv_login": 7, "maxwait": 8, "maxwait_us": 100000 },
+            {"database": "prod", "user": "marco", "cl_active": 8, "cl_waiting": 7, "sv_active": 6, "sv_idle": 5, "sv_used": 4, "sv_tested": 3, "sv_login": 2, "maxwait": 1, "maxwait_us": 200000 }
         ]
     elif query == "SHOW DATABASES":
         return [
@@ -112,6 +112,21 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         self.assertEqual(metrics[0]["type"], "gauge")
         self.assertEqual(metrics[0]["value"], 0)
         self.assertEqual(metrics[0]["labels"], {})
+
+    def testShouldComputeMaxwait(self):
+        config = PgbouncerConfig({})
+        collector = PgbouncerMetricsCollector(config)
+        collector._createConnection = MagicMock(return_value=False)
+        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessFromPgBouncer17Mock)
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_pools_client_maxwait_seconds")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "gauge")
+        self.assertAlmostEqual(metrics[0]["value"], 8.1)
+        self.assertEqual(metrics[0]["labels"], {"database":"test", "user":"marco"})
+        self.assertEqual(metrics[1]["type"], "gauge")
+        self.assertAlmostEqual(metrics[1]["value"], 1.2)
+        self.assertEqual(metrics[1]["labels"], {"database":"prod", "user":"marco"})
 
     def testShouldExportDatabasesMetrics(self):
         config = PgbouncerConfig({})
