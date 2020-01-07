@@ -1,5 +1,8 @@
 # Changelog
 
+### 2.0.3 (2020-01-07)
+- Changed author of the package
+
 ### 2.0.2 (2020-01-07)
 - [#17](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/17) Add `maxwait_us` to the compute of `client_maxwait_seconds` metric to have a higher precission
 
