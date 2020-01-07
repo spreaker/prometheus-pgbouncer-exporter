@@ -1,5 +1,8 @@
 # Changelog
 
+### 2.0.2 (2020-01-07)
+- [#17](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/17) Add `maxwait_us` to the compute of `client_maxwait_seconds` metric to have a higher precission
+
 ### 2.0.1 (2018-12-11)
 - [BUGFIX] Correctly mask the DSN in logs when the password is empty
 

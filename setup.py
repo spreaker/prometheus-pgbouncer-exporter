@@ -11,7 +11,7 @@ with open('README.md') as file:
 setup(
   name             = 'prometheus-pgbouncer-exporter',
   packages         = ['prometheus_pgbouncer_exporter'],
-  version          = '2.0.1',
+  version          = '2.0.2',
   description      = 'Prometheus exporter for PgBouncer',
   long_description = long_description,
   author           = 'Marco Pracucci',
