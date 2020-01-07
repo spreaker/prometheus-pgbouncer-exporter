@@ -151,7 +151,9 @@ pycodestyle --max-line-length=300 prometheus_pgbouncer_exporter/*.py
 1. Update version in `setup.py`
 2. Update `CHANGELOG.md`
 3. [Release new version on GitHub](https://github.com/spreaker/prometheus-pgbouncer-exporter/releases)
-4. Run `python3 setup.py sdist upload -r pypi`
+4. Run `python3 setup.py sdist`
+5. Upload it with `twine upload dist/*`
+6. Upload the files to the Github release
 
 **Release Docker image**:
 
