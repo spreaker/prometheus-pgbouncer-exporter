@@ -168,8 +168,8 @@ pycodestyle --max-line-length=300 prometheus_pgbouncer_exporter/*.py
    docker tag prometheus-pgbouncer-exporter spreaker/prometheus-pgbouncer-exporter:latest && \
    docker push spreaker/prometheus-pgbouncer-exporter:latest
 
-   docker tag prometheus-pgbouncer-exporter spreaker/prometheus-pgbouncer-exporter:2.0.1 && \
-   docker push spreaker/prometheus-pgbouncer-exporter:2.0.1
+   docker tag prometheus-pgbouncer-exporter spreaker/prometheus-pgbouncer-exporter:2.0.3 && \
+   docker push spreaker/prometheus-pgbouncer-exporter:2.0.3
    ```
 
 
