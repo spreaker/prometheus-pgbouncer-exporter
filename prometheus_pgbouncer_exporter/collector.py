@@ -8,6 +8,9 @@ from .config import PgbouncerConfig
 
 class PgbouncersMetricsCollector():
     def __init__(self, configs: List[PgbouncerConfig]):
+        self.update(configs)
+
+    def update(self, configs: List[PgbouncerConfig]):
         self.collectors = list(map(lambda config: PgbouncerMetricsCollector(config), configs))
 
     def collect(self):
