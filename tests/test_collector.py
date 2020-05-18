@@ -23,8 +23,13 @@ def fetchMetricsSuccessFromPgBouncer17Mock(conn, query):
         ]
     elif query == "SHOW DATABASES":
         return [
-            {"name": "test","database": "test", "pool_size": 50, "reserve_pool": 10, "current_connections": 30 },
-            {"name": "prod","database": "prod", "pool_size": 90, "reserve_pool": 20, "current_connections": 75 }
+            {"name": "test","database": "test", "pool_size": 50, "reserve_pool": 10, "current_connections": 30, "max_connections": 0},
+            {"name": "prod","database": "prod", "pool_size": 90, "reserve_pool": 20, "current_connections": 75, "max_connections": 5}
+        ]
+    elif query == "SHOW CONFIG":
+        return [
+            {"key": "max_client_conn","value": 500, "changeable": "yes"},
+            {"key": "max_user_connections","value": 0, "changeable": "yes"}
         ]
     else:
         return False
@@ -42,9 +47,14 @@ def fetchMetricsSuccessFromPgBouncer18Mock(conn, query):
         ]
     elif query == "SHOW DATABASES":
         return [
-            {"name": "test","database": "test", "pool_size": 50, "reserve_pool": 10, "current_connections": 30 },
-            {"name": "prod","database": "prod", "pool_size": 90, "reserve_pool": 20, "current_connections": 75 }
+            {"name": "test","database": "test", "pool_size": 50, "reserve_pool": 10, "current_connections": 30, "max_connections": 0},
+            {"name": "prod","database": "prod", "pool_size": 90, "reserve_pool": 20, "current_connections": 75, "max_connections": 5}
         ]
+    elif query == "SHOW CONFIG":
+        return [
+            {"key": "max_client_conn","value": 500, "changeable": "yes"},
+            {"key": "max_user_connections","value": 0, "changeable": "yes"}
+        ]        
     else:
         return False
 
@@ -57,6 +67,8 @@ def fetchMetricsPartialFailureFromPgBouncer17Mock(conn, query):
     elif query == "SHOW POOLS":
         raise Exception("Error while fetching metrics")
     elif query == "SHOW DATABASES":
+        raise Exception("Error while fetching metrics")
+    elif query == "SHOW CONFIG":
         raise Exception("Error while fetching metrics")
     else:
         return False
@@ -160,6 +172,32 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         self.assertEqual(metrics[1]["type"], "gauge")
         self.assertEqual(metrics[1]["value"], 75)
         self.assertEqual(metrics[1]["labels"], {"backend_database":"prod", "database":"prod"})
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_databases_database_max_connections")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "gauge")
+        self.assertEqual(metrics[0]["value"], 0)
+        self.assertEqual(metrics[0]["labels"], {"backend_database":"test", "database":"test"})
+        self.assertEqual(metrics[1]["type"], "gauge")
+        self.assertEqual(metrics[1]["value"], 5)
+        self.assertEqual(metrics[1]["labels"], {"backend_database":"prod", "database":"prod"})
+
+    def testShouldExportConfigMetrics(self):
+        config = PgbouncerConfig({})
+        collector = PgbouncerMetricsCollector(config)
+        collector._createConnection = MagicMock(return_value=False)
+        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsSuccessFromPgBouncer17Mock)
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_config_max_client_conn")
+        self.assertEqual(len(metrics), 1)
+        self.assertEqual(metrics[0]["type"], "gauge")
+        self.assertEqual(metrics[0]["value"], 500)        
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_config_max_user_connections")
+        self.assertEqual(len(metrics), 1)
+        self.assertEqual(metrics[0]["type"], "gauge")
+        self.assertEqual(metrics[0]["value"], 0)        
+        
 
     def testShouldExportQueriesMetricsFromPgBouncer17(self):
         config = PgbouncerConfig({})
