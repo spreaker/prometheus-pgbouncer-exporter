@@ -28,8 +28,8 @@ def fetchMetricsSuccessFromPgBouncer17Mock(conn, query):
         ]
     elif query == "SHOW CONFIG":
         return [
-            {"key": "max_client_conn","value": 500, "changeable": "yes"},
-            {"key": "max_user_connections","value": 0, "changeable": "yes"}
+            {"key": "max_client_conn",      "value": 500, "changeable": "yes"},
+            {"key": "max_user_connections", "value": 0,   "changeable": "yes"}
         ]
     else:
         return False
@@ -52,8 +52,8 @@ def fetchMetricsSuccessFromPgBouncer18Mock(conn, query):
         ]
     elif query == "SHOW CONFIG":
         return [
-            {"key": "max_client_conn","value": 500, "changeable": "yes"},
-            {"key": "max_user_connections","value": 0, "changeable": "yes"}
+            {"key": "max_client_conn",      "value": 500, "changeable": "yes"},
+            {"key": "max_user_connections", "value": 0,   "changeable": "yes"}
         ]        
     else:
         return False
