@@ -196,7 +196,7 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         metrics = getMetricsByName(collector.collect(), "pgbouncer_config_max_user_connections")
         self.assertEqual(len(metrics), 1)
         self.assertEqual(metrics[0]["type"], "gauge")
-        self.assertEqual(metrics[0]["value"], 0)        
+        self.assertEqual(metrics[0]["value"], 0)
         
 
     def testShouldExportQueriesMetricsFromPgBouncer17(self):
