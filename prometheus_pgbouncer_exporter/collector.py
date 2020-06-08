@@ -99,7 +99,7 @@ class PgbouncerMetricsCollector():
                     {"type": "gauge", "column": "pool_size",           "metric": "database_pool_size",           "help": "Configured Pool Size Limit"},
                     {"type": "gauge", "column": "reserve_pool",        "metric": "database_reserve_pool_size",   "help": "Configured Reserve Limit"},
                     {"type": "gauge", "column": "current_connections", "metric": "database_current_connections", "help": "Database connection count"},
-                    {"type": "gauge", "column": "max_connections",     "metric": "database_max_connections",     "help": "Database maximum number of allowed connections"},                    
+                    {"type": "gauge", "column": "max_connections",     "metric": "database_max_connections",     "help": "Database maximum number of allowed connections"},
                 ], {"name": "database", "database": "backend_database"}, self.config.getExtraLabels())
             else:
                 success = False
