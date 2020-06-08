@@ -165,7 +165,7 @@ class PgbouncerMetricsCollector():
         metrics = []
 
         for result in results:
-            for mapping in metricMappings:                
+            for mapping in metricMappings:
                 if (result["key"] == mapping["key"]):
                     metrics.append({
                         "type":   mapping["type"],
