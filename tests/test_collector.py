@@ -191,7 +191,7 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         metrics = getMetricsByName(collector.collect(), "pgbouncer_config_max_client_conn")
         self.assertEqual(len(metrics), 1)
         self.assertEqual(metrics[0]["type"], "gauge")
-        self.assertEqual(metrics[0]["value"], 500)        
+        self.assertEqual(metrics[0]["value"], 500)
 
         metrics = getMetricsByName(collector.collect(), "pgbouncer_config_max_user_connections")
         self.assertEqual(len(metrics), 1)
