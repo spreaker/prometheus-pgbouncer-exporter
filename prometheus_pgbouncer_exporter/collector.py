@@ -171,7 +171,7 @@ class PgbouncerMetricsCollector():
                         "type":   mapping["type"],
                         "name":   metricPrefix + mapping['metric'],
                         "value":  int(result["value"]),
-                        "labels": extraLabels,                   
+                        "labels": extraLabels,
                         "help":   mapping["help"]
                     })
                  
