@@ -174,7 +174,7 @@ class PgbouncerMetricsCollector():
                         "labels": extraLabels,
                         "help":   mapping["help"]
                     })
-                 
+
         return metrics
 
     def _filterMetricsByIncludeDatabases(self, results, databases):

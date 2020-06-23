@@ -54,7 +54,7 @@ def fetchMetricsSuccessFromPgBouncer18Mock(conn, query):
         return [
             {"key": "max_client_conn",      "value": 500, "changeable": "yes"},
             {"key": "max_user_connections", "value": 0,   "changeable": "yes"}
-        ]        
+        ]
     else:
         return False
 
@@ -197,7 +197,7 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         self.assertEqual(len(metrics), 1)
         self.assertEqual(metrics[0]["type"], "gauge")
         self.assertEqual(metrics[0]["value"], 0)
-        
+
 
     def testShouldExportQueriesMetricsFromPgBouncer17(self):
         config = PgbouncerConfig({})
