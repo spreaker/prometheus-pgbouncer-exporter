@@ -1,5 +1,13 @@
 # Changelog
 
+### 2.1.0 (2020-07-10)
+- Upgraded PyYAML to 5.3.1 to fix CVE-2017-18342 among others
+- [FEATURE] Reload configuration file on SIGHUP. [#21](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/21) (thanks to [Vineet Joshi](https://github.com/jvineet))
+- [FEATURE] Added new metrics taken from pgbouncer configuration [#23](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/23) (thanks to [José Gabriel Duarte](https://github.com/jgduarte-stratio))
+    - `pgbouncer_databases_database_max_connections`: Maximum number of allowed connections per-database (labels: `database`, `backend_database`)
+    - `pgbouncer_config_max_client_conn`: Configuration of maximum number of allowed client connections
+    - `pgbouncer_config_max_user_connections`: Configuration of maximum number of server connections per user
+
 ### 2.0.3 (2020-01-07)
 - Changed author of the package
 
