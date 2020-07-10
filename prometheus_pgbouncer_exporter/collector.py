@@ -99,7 +99,18 @@ class PgbouncerMetricsCollector():
                     {"type": "gauge", "column": "pool_size",           "metric": "database_pool_size",           "help": "Configured Pool Size Limit"},
                     {"type": "gauge", "column": "reserve_pool",        "metric": "database_reserve_pool_size",   "help": "Configured Reserve Limit"},
                     {"type": "gauge", "column": "current_connections", "metric": "database_current_connections", "help": "Database connection count"},
+                    {"type": "gauge", "column": "max_connections",     "metric": "database_max_connections",     "help": "Database maximum number of allowed connections"},
                 ], {"name": "database", "database": "backend_database"}, self.config.getExtraLabels())
+            else:
+                success = False
+
+            # SHOW CONFIG
+            results = self._fetchMetrics(conn, "SHOW CONFIG")
+            if results:
+                metrics += self._exportKeyValueMetrics(results, "pgbouncer_config_", [
+                    {"type": "gauge", "key": "max_client_conn",      "metric": "max_client_conn",      "help": "Config maximum number of client connections"},
+                    {"type": "gauge", "key": "max_user_connections", "metric": "max_user_connections", "help": "Config maximum number of server connections per user"},
+                    ], self.config.getExtraLabels())
             else:
                 success = False
 
@@ -147,6 +158,22 @@ class PgbouncerMetricsCollector():
                     "labels": labels,
                     "help":   mapping["help"]
                 })
+
+        return metrics
+
+    def _exportKeyValueMetrics(self, results, metricPrefix, metricMappings, extraLabels):
+        metrics = []
+
+        for result in results:
+            for mapping in metricMappings:
+                if (result["key"] == mapping["key"]):
+                    metrics.append({
+                        "type":   mapping["type"],
+                        "name":   metricPrefix + mapping['metric'],
+                        "value":  int(result["value"]),
+                        "labels": extraLabels,
+                        "help":   mapping["help"]
+                    })
 
         return metrics
 
