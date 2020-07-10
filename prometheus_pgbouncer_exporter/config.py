@@ -49,7 +49,7 @@ class Config():
         # Read file
         try:
             stream = open(filepath, "r")
-            self.config = yaml.load(stream)
+            self.config = yaml.load(stream, Loader=yaml.FullLoader)
 
             # Handle an empty configuration file
             if not self.config:

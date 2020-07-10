@@ -22,7 +22,7 @@ setup(
   keywords                      = ['prometheus', 'pgbouncer'],
   classifiers                   = [],
   python_requires               = ' >= 3',
-  install_requires              = ['psycopg2 == 2.7.3.2', 'prometheus_client==0.0.21', 'python-json-logger==0.1.5', 'PyYAML==3.12'],
+  install_requires              = ['psycopg2 == 2.7.3.2', 'prometheus_client==0.0.21', 'python-json-logger==0.1.5', 'PyYAML==5.3.1'],
   entry_points                  = {
     'console_scripts': [
         'pgbouncer-exporter=prometheus_pgbouncer_exporter.cli:main',
