@@ -3,7 +3,7 @@ FROM python:3.6.10-alpine
 RUN apk update && \
  apk add postgresql-libs && \
  apk add --virtual .build-deps gcc musl-dev postgresql-dev && \
- python3 -m pip install prometheus-pgbouncer-exporter==2.0.3 --no-cache-dir && \
+ python3 -m pip install prometheus-pgbouncer-exporter==2.1.0 --no-cache-dir && \
  apk --purge del .build-deps
 
 ENV PGBOUNCER_EXPORTER_HOST="127.0.0.1" \
