@@ -70,6 +70,9 @@ The exporter exports the following metrics for each monitored pgbouncer instance
 | `pgbouncer_databases_database_pool_size`            | gauge    | _all_     | Configured pool size limit (labels: `database`, `backend_database`) |
 | `pgbouncer_databases_database_reserve_pool_size`    | gauge    | _all_     | Configured reserve limit (labels: `database`, `backend_database`) |
 | `pgbouncer_databases_database_current_connections`  | gauge    | _all_     | Total number of per-database Database connections count (labels: `database`, `backend_database`) |
+| `pgbouncer_databases_database_max_connections`      | gauge    | _all_     | Maximum number of allowed connections per-database (labels: `database`, `backend_database`) |
+| `pgbouncer_config_max_client_conn`                  | gauge    | _all_     | Configuration of maximum number of allowed client connections |
+| `pgbouncer_config_max_user_connections`             | gauge    | _all_     | Configuration of maximum number of server connections per user |
 
 
 ## Configuration file
@@ -168,8 +171,8 @@ pycodestyle --max-line-length=300 prometheus_pgbouncer_exporter/*.py
    docker tag prometheus-pgbouncer-exporter spreaker/prometheus-pgbouncer-exporter:latest && \
    docker push spreaker/prometheus-pgbouncer-exporter:latest
 
-   docker tag prometheus-pgbouncer-exporter spreaker/prometheus-pgbouncer-exporter:2.0.1 && \
-   docker push spreaker/prometheus-pgbouncer-exporter:2.0.1
+   docker tag prometheus-pgbouncer-exporter spreaker/prometheus-pgbouncer-exporter:2.0.3 && \
+   docker push spreaker/prometheus-pgbouncer-exporter:2.0.3
    ```
 
 
