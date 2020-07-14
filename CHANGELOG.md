@@ -1,5 +1,12 @@
 # Changelog
 
+### 2.1.1 (2020-07-14)
+
+- Upgraded dependencies
+    - `prometheus_client` to 0.8.0
+    - `psycopg2` to 2.8.5
+    - `python-json-logger` to 0.1.11
+
 ### 2.1.0 (2020-07-10)
 - Upgraded PyYAML to 5.3.1 to fix CVE-2017-18342 among others
 - [FEATURE] Reload configuration file on SIGHUP. [#21](https://github.com/spreaker/prometheus-pgbouncer-exporter/pull/21) (thanks to [Vineet Joshi](https://github.com/jvineet))
