@@ -49,30 +49,30 @@ PgBouncer is a single thread application and so can only saturate a single CPU c
 
 The exporter exports the following metrics for each monitored pgbouncer instance:
 
-| Metric name                                         | Type     | PgBouncer | Description      |
-| --------------------------------------------------- | -------- | --------- | ---------------- |
-| `pgbouncer_stats_requests_total`                    | counter  | _<= 1.7_  | Total number of requests pooled. Could be transactions or queries, depending on pool mode. (labels: `database`) |
-| `pgbouncer_stats_queries_total`                     | counter  | _>= 1.8_  | Total number of SQL queries pooled by pgbouncer (labels: `database`) |
-| `pgbouncer_stats_queries_duration_microseconds`     | counter  | _all_     | Total number of microseconds spent waiting for a server to return a query response. Includes time spent waiting for an available connection. (labels: `database`) |
-| `pgbouncer_stats_waiting_duration_microseconds`     | counter  | _>= 1.8_  | Total number of microseconds spent waiting for an available connection. (labels: `database`) |
-| `pgbouncer_stats_received_bytes_total`              | counter  | _all_     | Total volume in bytes of network traffic received by pgbouncer (labels: `database`) |
-| `pgbouncer_stats_sent_bytes_total`                  | counter  | _all_     | Total volume in bytes of network traffic sent by pgbouncer (labels: `database`) |
-| `pgbouncer_stats_transactions_total`                | counter  | _>= 1.8_  | Total number of SQL transactions pooled by pgbouncer (labels: `database`) |
-| `pgbouncer_stats_transactions_duration_microseconds`| counter  | _>= 1.8_  | Total number of microseconds spent in a transaction. Includes time spent waiting for an available connection. (labels: `database`) |
-| `pgbouncer_pools_client_active_connections`         | gauge    | _all_     | Client connections that are linked to server connection and can process queries (labels: `database`, `user`) |
-| `pgbouncer_pools_client_waiting_connections`        | gauge    | _all_     | Client connections have sent queries but have not yet got a server connection (labels: `database`, `user`) |
-| `pgbouncer_pools_server_active_connections`         | gauge    | _all_     | Server connections that linked to client (labels: `database`, `user`) |
-| `pgbouncer_pools_server_idle_connections`           | gauge    | _all_     | Server connections that unused and immediately usable for client queries (labels: `database`, `user`) |
-| `pgbouncer_pools_server_used_connections`           | gauge    | _all_     | Server connections that have been idle more than server_check_delay, so they needs server_check_query to run on it before it can be used (labels: `database`, `user`) |
-| `pgbouncer_pools_server_testing_connections`        | gauge    | _all_     | Server connections that are currently running either server_reset_query or server_check_query (labels: `database`, `user`) |
-| `pgbouncer_pools_server_login_connections`          | gauge    | _all_     | Server connections currently in logging in process (labels: `database`, `user`) |
-| `pgbouncer_pools_client_maxwait_seconds`            | gauge    | _all_     | How long the first (oldest) client in queue has waited, in seconds (labels: `database`, `user`) |
-| `pgbouncer_databases_database_pool_size`            | gauge    | _all_     | Configured pool size limit (labels: `database`, `backend_database`) |
-| `pgbouncer_databases_database_reserve_pool_size`    | gauge    | _all_     | Configured reserve limit (labels: `database`, `backend_database`) |
-| `pgbouncer_databases_database_current_connections`  | gauge    | _all_     | Total number of per-database Database connections count (labels: `database`, `backend_database`) |
-| `pgbouncer_databases_database_max_connections`      | gauge    | _all_     | Maximum number of allowed connections per-database (labels: `database`, `backend_database`) |
-| `pgbouncer_config_max_client_conn`                  | gauge    | _all_     | Configuration of maximum number of allowed client connections |
-| `pgbouncer_config_max_user_connections`             | gauge    | _all_     | Configuration of maximum number of server connections per user |
+| Metric name                                               | Type     | PgBouncer | Description      |
+| --------------------------------------------------------- | -------- | --------- | ---------------- |
+| `pgbouncer_stats_requests_total`                          | counter  | _<= 1.7_  | Total number of requests pooled. Could be transactions or queries, depending on pool mode. (labels: `database`) |
+| `pgbouncer_stats_queries_total`                           | counter  | _>= 1.8_  | Total number of SQL queries pooled by pgbouncer (labels: `database`) |
+| `pgbouncer_stats_queries_duration_microseconds_total`     | counter  | _all_     | Total number of microseconds spent waiting for a server to return a query response. Includes time spent waiting for an available connection. (labels: `database`) |
+| `pgbouncer_stats_waiting_duration_microseconds_total`     | counter  | _>= 1.8_  | Total number of microseconds spent waiting for an available connection. (labels: `database`) |
+| `pgbouncer_stats_received_bytes_total`                    | counter  | _all_     | Total volume in bytes of network traffic received by pgbouncer (labels: `database`) |
+| `pgbouncer_stats_sent_bytes_total`                        | counter  | _all_     | Total volume in bytes of network traffic sent by pgbouncer (labels: `database`) |
+| `pgbouncer_stats_transactions_total`                      | counter  | _>= 1.8_  | Total number of SQL transactions pooled by pgbouncer (labels: `database`) |
+| `pgbouncer_stats_transactions_duration_microseconds_total`| counter  | _>= 1.8_  | Total number of microseconds spent in a transaction. Includes time spent waiting for an available connection. (labels: `database`) |
+| `pgbouncer_pools_client_active_connections`               | gauge    | _all_     | Client connections that are linked to server connection and can process queries (labels: `database`, `user`) |
+| `pgbouncer_pools_client_waiting_connections`              | gauge    | _all_     | Client connections have sent queries but have not yet got a server connection (labels: `database`, `user`) |
+| `pgbouncer_pools_server_active_connections`               | gauge    | _all_     | Server connections that linked to client (labels: `database`, `user`) |
+| `pgbouncer_pools_server_idle_connections`                 | gauge    | _all_     | Server connections that unused and immediately usable for client queries (labels: `database`, `user`) |
+| `pgbouncer_pools_server_used_connections`                 | gauge    | _all_     | Server connections that have been idle more than server_check_delay, so they needs server_check_query to run on it before it can be used (labels: `database`, `user`) |
+| `pgbouncer_pools_server_testing_connections`              | gauge    | _all_     | Server connections that are currently running either server_reset_query or server_check_query (labels: `database`, `user`) |
+| `pgbouncer_pools_server_login_connections`                | gauge    | _all_     | Server connections currently in logging in process (labels: `database`, `user`) |
+| `pgbouncer_pools_client_maxwait_seconds`                  | gauge    | _all_     | How long the first (oldest) client in queue has waited, in seconds (labels: `database`, `user`) |
+| `pgbouncer_databases_database_pool_size`                  | gauge    | _all_     | Configured pool size limit (labels: `database`, `backend_database`) |
+| `pgbouncer_databases_database_reserve_pool_size`          | gauge    | _all_     | Configured reserve limit (labels: `database`, `backend_database`) |
+| `pgbouncer_databases_database_current_connections`        | gauge    | _all_     | Total number of per-database Database connections count (labels: `database`, `backend_database`) |
+| `pgbouncer_databases_database_max_connections`            | gauge    | _all_     | Maximum number of allowed connections per-database (labels: `database`, `backend_database`) |
+| `pgbouncer_config_max_client_conn`                        | gauge    | _all_     | Configuration of maximum number of allowed client connections |
+| `pgbouncer_config_max_user_connections`                   | gauge    | _all_     | Configuration of maximum number of server connections per user |
 
 
 ## Configuration file
