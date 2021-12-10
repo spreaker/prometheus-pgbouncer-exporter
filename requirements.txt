@@ -1,5 +1,5 @@
 psycopg2==2.8.5
 prometheus_client==0.8.0
-python-json-logger==0.1.11
+python-json-logger==2.0.1
 pycodestyle
 PyYAML==5.3.1

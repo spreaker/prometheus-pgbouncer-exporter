@@ -1,3 +1,5 @@
+.DS_Store
+build
 dist
 MANIFEST
 prometheus_pgbouncer_exporter.egg-info

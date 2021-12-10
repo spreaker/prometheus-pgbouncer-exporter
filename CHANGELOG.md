@@ -1,5 +1,11 @@
 # Changelog
 
+### 2.1.2 (2021-12-10)
+
+- Upgraded dependencies
+    - `python-json-logger` to 2.0.1
+- [BUGFIX] Update format string for json logger (python 3.8+ issue)
+
 ### 2.1.1 (2020-07-14)
 
 - Upgraded dependencies
