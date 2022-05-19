@@ -1,5 +1,11 @@
 # Changelog
 
+### 2.1.2 (2021-10-08)
+
+- Upgraded dependencies
+   - `pyyaml` to 5.4.1 also changed fixed version to minimum version
+     constraint.
+
 ### 2.1.1 (2020-07-14)
 
 - Upgraded dependencies

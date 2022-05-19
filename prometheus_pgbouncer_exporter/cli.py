@@ -44,7 +44,7 @@ def main():
 
     # Init logger
     logHandler = logging.FileHandler(args.log_file) if args.log_file is not "stdout" else logging.StreamHandler()
-    formatter = jsonlogger.JsonFormatter("(asctime) (levelname) (message)", datefmt="%Y-%m-%d %H:%M:%S")
+    formatter = jsonlogger.JsonFormatter("%(asctime)s %(levelname)s %(message)s`", datefmt="%Y-%m-%d %H:%M:%S")
     logHandler.setFormatter(formatter)
     logging.getLogger().addHandler(logHandler)
     logging.getLogger().setLevel(args.log_level)
