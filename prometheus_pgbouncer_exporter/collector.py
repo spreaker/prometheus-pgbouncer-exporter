@@ -30,9 +30,9 @@ class PgbouncersMetricsCollector():
         return metrics.values()
 
     def _instanceMetric(self, data):
-        if data["type"] is "counter":
+        if data["type"] == "counter":
             return CounterMetricFamily(data["name"], data["help"], labels=data["labels"].keys())
-        elif data["type"] is "gauge":
+        elif data["type"] == "gauge":
             return GaugeMetricFamily(data["name"], data["help"], labels=data["labels"].keys())
         else:
             raise Exception("Unsupported metric type: {type}".format(type=data['type']))
@@ -65,12 +65,18 @@ class PgbouncerMetricsCollector():
                     {"type": "counter", "column": "total_query_count", "metric": "queries_total",                      "help": "Total number of queries pooled"},
                     {"type": "counter", "column": "total_xact_time",   "metric": "transactions_duration_microseconds", "help": "Total number of microseconds spent in a transaction. Includes time spent waiting for an available connection."},
                     {"type": "counter", "column": "total_wait_time",   "metric": "waiting_duration_microseconds",      "help": "Total number of microseconds spent waiting for an available connection."},
+                    {"type": "gauge",   "column": "avg_xact_count",    "metric": "transactions_average",                       "help": "Average transactions per second in last stat period."},
+                    {"type": "gauge",   "column": "avg_query_count",   "metric": "queries_average",                            "help": "Average queries per second in last stat period."},
+                    {"type": "gauge",   "column": "avg_recv",          "metric": "received_bytes_average",                     "help": "Average received (from clients) bytes per second."},
+                    {"type": "gauge",   "column": "avg_sent",          "metric": "sent_bytes_average",                         "help": "Average sent (to clients) bytes per second."},
+                    {"type": "gauge",   "column": "avg_xact_time",     "metric": "transactions_duration_average_microseconds", "help": "Average transaction duration, in microseconds."},
+                    {"type": "gauge",   "column": "avg_query_time",    "metric": "queries_duration_average_microseconds",      "help": "Average query duration, in microseconds."},
+                    {"type": "gauge",   "column": "avg_wait_time",     "metric": "waiting_duration_average_microseconds",      "help": "Average time spent by clients waiting for a server that were assigned a backend connection within the current stats_period, in microseconds (averaged per second within that period)."},
 
                     # all versions
-                    {"type": "counter", "column": "total_query_time",  "metric": "queries_duration_microseconds",      "help": "Total number of microseconds spent waiting for a server to return a query response. Includes time spent waiting for an available connection."},
-                    {"type": "counter", "column": "total_received",    "metric": "received_bytes_total",               "help": "Total volume in bytes of network traffic received by pgbouncer"},
-                    {"type": "counter", "column": "total_sent",        "metric": "sent_bytes_total",                   "help": "Total volume in bytes of network traffic sent by pgbouncer"},
-
+                    {"type": "counter", "column": "total_query_time",  "metric": "queries_duration_microseconds",              "help": "Total number of microseconds spent waiting for a server to return a query response. Includes time spent waiting for an available connection."},
+                    {"type": "counter", "column": "total_received",    "metric": "received_bytes_total",                       "help": "Total volume in bytes of network traffic received by pgbouncer"},
+                    {"type": "counter", "column": "total_sent",        "metric": "sent_bytes_total",                           "help": "Total volume in bytes of network traffic sent by pgbouncer"},
                 ], {"database": "database"}, self.config.getExtraLabels())
             else:
                 success = False

@@ -1,4 +1,4 @@
-FROM python:3.6.10-alpine
+FROM python:3.8-alpine
 
 RUN apk update && \
  apk add postgresql-libs && \
