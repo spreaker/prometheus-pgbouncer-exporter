@@ -37,8 +37,8 @@ def fetchMetricsSuccessFromPgBouncer17Mock(conn, query):
 def fetchMetricsSuccessFromPgBouncer18Mock(conn, query):
     if query == "SHOW STATS":
         return [
-            {"database": "test", "total_query_count": 1, "total_xact_count": 2, "total_xact_time": 2, "total_wait_time": 1, "total_query_time": 2, "total_received": 3, "total_sent": 4},
-            {"database": "prod", "total_query_count": 4, "total_xact_count": 6, "total_xact_time": 3, "total_wait_time": 2, "total_query_time": 3, "total_received": 2, "total_sent": 1}
+            {"database": "test", "total_query_count": 1, "total_xact_count": 2, "total_xact_time": 2, "total_wait_time": 1, "total_query_time": 2, "total_received": 3, "total_sent": 4, "avg_xact_count": 3},
+            {"database": "prod", "total_query_count": 4, "total_xact_count": 6, "total_xact_time": 3, "total_wait_time": 2, "total_query_time": 3, "total_received": 2, "total_sent": 1, "avg_xact_count": 4}
         ]
     elif query == "SHOW POOLS":
         return [
@@ -318,6 +318,15 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
 
         metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_requests_total")
         self.assertEqual(len(metrics), 0)
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_stats_transactions_average")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "gauge")
+        self.assertEqual(metrics[0]["value"], 3)
+        self.assertEqual(metrics[0]["labels"], {"database":"test"})
+        self.assertEqual(metrics[1]["type"], "gauge")
+        self.assertEqual(metrics[1]["value"], 4)
+        self.assertEqual(metrics[1]["labels"], {"database":"prod"})
 
     #
     # Databases filtering

@@ -43,7 +43,7 @@ def main():
     args = parser.parse_args()
 
     # Init logger
-    logHandler = logging.FileHandler(args.log_file) if args.log_file is not "stdout" else logging.StreamHandler()
+    logHandler = logging.FileHandler(args.log_file) if args.log_file != "stdout" else logging.StreamHandler()
     formatter = jsonlogger.JsonFormatter("%(asctime)s %(levelname)s %(message)s`", datefmt="%Y-%m-%d %H:%M:%S")
     logHandler.setFormatter(formatter)
     logging.getLogger().addHandler(logHandler)
@@ -59,7 +59,7 @@ def main():
         sighup_received_count += 1
         logging.getLogger().info("Received SIGHUP - Incrementing HUP counter to %s",
                                  sighup_received_count)
-        if args.log_file is not "stdout":
+        if args.log_file != "stdout":
             logging.getLogger().info("Received SIGHUP - log file is closing")
             logHandler.close()
             logging.getLogger().info("Received SIGHUP - log file has been re-opened")
