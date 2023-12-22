@@ -23,8 +23,8 @@ def fetchMetricsSuccessFromPgBouncer17Mock(conn, query):
         ]
     elif query == "SHOW DATABASES":
         return [
-            {"name": "test","database": "test", "pool_size": 50, "reserve_pool": 10, "current_connections": 30, "max_connections": 0},
-            {"name": "prod","database": "prod", "pool_size": 90, "reserve_pool": 20, "current_connections": 75, "max_connections": 5}
+            {"name": "test","database": "postgres", "pool_size": 50, "reserve_pool": 10, "current_connections": 30, "max_connections": 0},
+            {"name": "prod","database": "postgres", "pool_size": 90, "reserve_pool": 20, "current_connections": 75, "max_connections": 5}
         ]
     elif query == "SHOW CONFIG":
         return [
@@ -47,8 +47,8 @@ def fetchMetricsSuccessFromPgBouncer18Mock(conn, query):
         ]
     elif query == "SHOW DATABASES":
         return [
-            {"name": "test","database": "test", "pool_size": 50, "reserve_pool": 10, "current_connections": 30, "max_connections": 0},
-            {"name": "prod","database": "prod", "pool_size": 90, "reserve_pool": 20, "current_connections": 75, "max_connections": 5}
+            {"name": "test","database": "postgres", "pool_size": 50, "reserve_pool": 10, "current_connections": 30, "max_connections": 0},
+            {"name": "prod","database": "postgres", "pool_size": 90, "reserve_pool": 20, "current_connections": 75, "max_connections": 5}
         ]
     elif query == "SHOW CONFIG":
         return [
@@ -150,37 +150,37 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         self.assertEqual(len(metrics), 2)
         self.assertEqual(metrics[0]["type"], "gauge")
         self.assertEqual(metrics[0]["value"], 50)
-        self.assertEqual(metrics[0]["labels"], {"backend_database":"test", "database":"test"})
+        self.assertEqual(metrics[0]["labels"], {"backend_database":"postgres", "database":"test"})
         self.assertEqual(metrics[1]["type"], "gauge")
         self.assertEqual(metrics[1]["value"], 90)
-        self.assertEqual(metrics[1]["labels"], {"backend_database":"prod", "database":"prod"})
+        self.assertEqual(metrics[1]["labels"], {"backend_database":"postgres", "database":"prod"})
 
         metrics = getMetricsByName(collector.collect(), "pgbouncer_databases_database_reserve_pool_size")
         self.assertEqual(len(metrics), 2)
         self.assertEqual(metrics[0]["type"], "gauge")
         self.assertEqual(metrics[0]["value"], 10)
-        self.assertEqual(metrics[0]["labels"], {"backend_database":"test", "database":"test"})
+        self.assertEqual(metrics[0]["labels"], {"backend_database":"postgres", "database":"test"})
         self.assertEqual(metrics[1]["type"], "gauge")
         self.assertEqual(metrics[1]["value"], 20)
-        self.assertEqual(metrics[1]["labels"], {"backend_database":"prod", "database":"prod"})
+        self.assertEqual(metrics[1]["labels"], {"backend_database":"postgres", "database":"prod"})
 
         metrics = getMetricsByName(collector.collect(), "pgbouncer_databases_database_current_connections")
         self.assertEqual(len(metrics), 2)
         self.assertEqual(metrics[0]["type"], "gauge")
         self.assertEqual(metrics[0]["value"], 30)
-        self.assertEqual(metrics[0]["labels"], {"backend_database":"test", "database":"test"})
+        self.assertEqual(metrics[0]["labels"], {"backend_database":"postgres", "database":"test"})
         self.assertEqual(metrics[1]["type"], "gauge")
         self.assertEqual(metrics[1]["value"], 75)
-        self.assertEqual(metrics[1]["labels"], {"backend_database":"prod", "database":"prod"})
+        self.assertEqual(metrics[1]["labels"], {"backend_database":"postgres", "database":"prod"})
 
         metrics = getMetricsByName(collector.collect(), "pgbouncer_databases_database_max_connections")
         self.assertEqual(len(metrics), 2)
         self.assertEqual(metrics[0]["type"], "gauge")
         self.assertEqual(metrics[0]["value"], 0)
-        self.assertEqual(metrics[0]["labels"], {"backend_database":"test", "database":"test"})
+        self.assertEqual(metrics[0]["labels"], {"backend_database":"postgres", "database":"test"})
         self.assertEqual(metrics[1]["type"], "gauge")
         self.assertEqual(metrics[1]["value"], 5)
-        self.assertEqual(metrics[1]["labels"], {"backend_database":"prod", "database":"prod"})
+        self.assertEqual(metrics[1]["labels"], {"backend_database":"postgres", "database":"prod"})
 
     def testShouldExportConfigMetrics(self):
         config = PgbouncerConfig({})
@@ -347,6 +347,15 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         self.assertEqual(metrics[1]["value"], 8)
         self.assertEqual(metrics[1]["labels"], {"database":"prod", "user": "marco"})
 
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_databases_database_pool_size")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "gauge")
+        self.assertEqual(metrics[0]["value"], 50)
+        self.assertEqual(metrics[0]["labels"], {"backend_database":"postgres", "database":"test"})
+        self.assertEqual(metrics[1]["type"], "gauge")
+        self.assertEqual(metrics[1]["value"], 90)
+        self.assertEqual(metrics[1]["labels"], {"backend_database":"postgres", "database":"prod"})
+
     def testShouldNotFilterDatabasesOnEmptyIncludeDatabasesConfigOption(self):
         config = PgbouncerConfig({"include_databases":[]})
         collector = PgbouncerMetricsCollector(config)
@@ -371,6 +380,15 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         self.assertEqual(metrics[1]["value"], 8)
         self.assertEqual(metrics[1]["labels"], {"database":"prod", "user": "marco"})
 
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_databases_database_pool_size")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics[0]["type"], "gauge")
+        self.assertEqual(metrics[0]["value"], 50)
+        self.assertEqual(metrics[0]["labels"], {"backend_database":"postgres", "database":"test"})
+        self.assertEqual(metrics[1]["type"], "gauge")
+        self.assertEqual(metrics[1]["value"], 90)
+        self.assertEqual(metrics[1]["labels"], {"backend_database":"postgres", "database":"prod"})
+
     def testShouldFilterDatabasesByIncludeDatabasesConfigOption(self):
         config = PgbouncerConfig({"include_databases": ["prod"]})
         collector = PgbouncerMetricsCollector(config)
@@ -389,6 +407,12 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         self.assertEqual(metrics[0]["value"], 8)
         self.assertEqual(metrics[0]["labels"], {"database":"prod", "user": "marco"})
 
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_databases_database_pool_size")
+        self.assertEqual(len(metrics), 1)
+        self.assertEqual(metrics[0]["type"], "gauge")
+        self.assertEqual(metrics[0]["value"], 90)
+        self.assertEqual(metrics[0]["labels"], {"backend_database":"postgres", "database":"prod"})
+
     def testShouldFilterDatabasesByExcludeDatabasesConfigOption(self):
         config = PgbouncerConfig({"exclude_databases": ["prod"]})
         collector = PgbouncerMetricsCollector(config)
@@ -406,6 +430,12 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
         self.assertEqual(metrics[0]["type"], "gauge")
         self.assertEqual(metrics[0]["value"], 1)
         self.assertEqual(metrics[0]["labels"], {"database":"test", "user": "marco"})
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_databases_database_pool_size")
+        self.assertEqual(len(metrics), 1)
+        self.assertEqual(metrics[0]["type"], "gauge")
+        self.assertEqual(metrics[0]["value"], 50)
+        self.assertEqual(metrics[0]["labels"], {"backend_database":"postgres", "database":"test"})
 
     #
     # Metrics exported on partial failure

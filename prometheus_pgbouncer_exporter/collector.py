@@ -96,8 +96,8 @@ class PgbouncerMetricsCollector():
             # SHOW DATABASES
             results = self._fetchMetrics(conn, "SHOW DATABASES")
             if results:
-                results = self._filterMetricsByIncludeDatabases(results, self.config.getIncludeDatabases())
-                results = self._filterMetricsByExcludeDatabases(results, self.config.getExcludeDatabases())
+                results = self._filterMetricsByIncludeDatabases(results, self.config.getIncludeDatabases(), "name")
+                results = self._filterMetricsByExcludeDatabases(results, self.config.getExcludeDatabases(), "name")
                 metrics += self._exportMetrics(results, "pgbouncer_databases_", [
                     {"type": "gauge", "column": "pool_size",           "metric": "database_pool_size",           "help": "Configured Pool Size Limit"},
                     {"type": "gauge", "column": "reserve_pool",        "metric": "database_reserve_pool_size",   "help": "Configured Reserve Limit"},
@@ -180,19 +180,19 @@ class PgbouncerMetricsCollector():
 
         return metrics
 
-    def _filterMetricsByIncludeDatabases(self, results, databases):
+    def _filterMetricsByIncludeDatabases(self, results, databases, filterKey = "database"):
         # No filtering if empty
         if not databases:
             return results
 
-        return list(filter(lambda item: item["database"] in databases, results))
+        return list(filter(lambda item: item[filterKey] in databases, results))
 
-    def _filterMetricsByExcludeDatabases(self, results, databases):
+    def _filterMetricsByExcludeDatabases(self, results, databases, filterKey = "database"):
         # No filtering if empty
         if not databases:
             return results
 
-        return list(filter(lambda item: item["database"] not in databases, results))
+        return list(filter(lambda item: item[filterKey] not in databases, results))
 
     def _fetchMetrics(self, conn, query):
         cursor = False
