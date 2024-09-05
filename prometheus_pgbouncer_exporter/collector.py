@@ -185,14 +185,14 @@ class PgbouncerMetricsCollector():
         if not databases:
             return results
 
-        return list(filter(lambda item: item["database"] in databases, results))
+        return filter(lambda item: item["database"] in databases, results)
 
     def _filterMetricsByExcludeDatabases(self, results, databases):
         # No filtering if empty
         if not databases:
             return results
 
-        return list(filter(lambda item: item["database"] not in databases, results))
+        return filter(lambda item: item["database"] not in databases, results)
 
     def _fetchMetrics(self, conn, query):
         cursor = False
