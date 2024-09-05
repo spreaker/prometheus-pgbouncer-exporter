@@ -30,9 +30,9 @@ class PgbouncersMetricsCollector():
         return metrics.values()
 
     def _instanceMetric(self, data):
-        if data["type"] is "counter":
+        if data["type"] == "counter":
             return CounterMetricFamily(data["name"], data["help"], labels=data["labels"].keys())
-        elif data["type"] is "gauge":
+        elif data["type"] == "gauge":
             return GaugeMetricFamily(data["name"], data["help"], labels=data["labels"].keys())
         else:
             raise Exception("Unsupported metric type: {type}".format(type=data['type']))
