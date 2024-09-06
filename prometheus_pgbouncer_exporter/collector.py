@@ -80,7 +80,8 @@ class PgbouncerMetricsCollector():
             if results:
                 results = self._filterMetricsByIncludeDatabases(results, self.config.getIncludeDatabases())
                 results = self._filterMetricsByExcludeDatabases(results, self.config.getExcludeDatabases())
-                results = self._filterEmptyPools(results)
+                if self.config.getFilterEmptyPools():
+                    results = self._filterEmptyPools(results)
                 metrics += self._exportMetrics(results, "pgbouncer_pools_", [
                     {"type": "gauge", "column": "cl_active",              "metric": "client_active_connections",   "help": "Client connections that are linked to server connection and can process queries"},
                     {"type": "gauge", "column": "cl_waiting",             "metric": "client_waiting_connections",  "help": "Client connections have sent queries but have not yet got a server connection"},

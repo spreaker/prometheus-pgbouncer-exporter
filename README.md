@@ -112,6 +112,12 @@ pgbouncers:
     extra_labels:
       pool_id: 1
 
+    # Omit metrics for pools for which PgBouncer has no client or server
+    # connections open. Recommended if you have a lot of different database
+    # users, because PgBouncer never forgets about users it has seen.
+    # If omitted, no filtering is done.
+    filter_empty_pools: true
+
   - dsn: postgresql://pgbouncer:$(PGBOUNCER_PASS)@localhost:6432/pgbouncer
     exclude_databases:
       - pgbouncer

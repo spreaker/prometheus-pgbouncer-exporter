@@ -105,6 +105,9 @@ class PgbouncerConfig():
     def getExcludeDatabases(self):
         return self.config["exclude_databases"] if "exclude_databases" in self.config else []
 
+    def getFilterEmptyPools(self):
+        return self.config.get("filter_empty_pools", False)
+
     def getExtraLabels(self):
         # Lazy instance extra labels
         if self.labels is False:
