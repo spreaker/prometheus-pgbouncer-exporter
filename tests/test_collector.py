@@ -80,7 +80,7 @@ def fetchMetricsPartialFailureFromPgBouncer17Mock(conn, query):
         raise Exception("Error while fetching metrics")
     elif query == "SHOW CONFIG":
         raise Exception("Error while fetching metrics")
-     elif query == "SHOW CLIENTS":
+    elif query == "SHOW CLIENTS":
         raise Exception("Error while fetching metrics")
     else:
         return False
