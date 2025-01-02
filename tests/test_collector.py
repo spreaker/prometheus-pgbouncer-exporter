@@ -23,13 +23,18 @@ def fetchMetricsSuccessFromPgBouncer17Mock(conn, query):
         ]
     elif query == "SHOW DATABASES":
         return [
-            {"name": "test","database": "test", "pool_size": 50, "reserve_pool": 10, "current_connections": 30, "max_connections": 0},
-            {"name": "prod","database": "prod", "pool_size": 90, "reserve_pool": 20, "current_connections": 75, "max_connections": 5}
+            {"name": "test", "database": "test", "pool_size": 50, "reserve_pool": 10, "current_connections": 30, "max_connections": 0},
+            {"name": "prod", "database": "prod", "pool_size": 90, "reserve_pool": 20, "current_connections": 75, "max_connections": 5}
         ]
     elif query == "SHOW CONFIG":
         return [
             {"key": "max_client_conn",      "value": 500, "changeable": "yes"},
             {"key": "max_user_connections", "value": 0,   "changeable": "yes"}
+        ]
+    elif query == "SHOW CLIENTS":
+        return [
+            {"name": "test", "client_user": "blah", "client_database": "blah", "client_replication": "blah", "client_state": "blah", "client_addr": "blah", "client_port": "blah", "client_local_addr": "blah", "client_local_port": "blah", "client_connect_time": "blah", "client_request_time": "blah", "client_wait": "blah", "client_wait_us": "blah", "client_ptr": "blah", "client_link": "blah", "client_tls": "blah", "client_application_name": "blah", "client_prepared_statements": "blah" },
+            {"name": "prod", "client_user": "blah", "client_database": "blah", "client_replication": "blah", "client_state": "blah", "client_addr": "blah", "client_port": "blah", "client_local_addr": "blah", "client_local_port": "blah", "client_connect_time": "blah", "client_request_time": "blah", "client_wait": "blah", "client_wait_us": "blah", "client_ptr": "blah", "client_link": "blah", "client_tls": "blah", "client_application_name": "blah", "client_prepared_statements": "blah" }
         ]
     else:
         return False
@@ -55,6 +60,11 @@ def fetchMetricsSuccessFromPgBouncer18Mock(conn, query):
             {"key": "max_client_conn",      "value": 500, "changeable": "yes"},
             {"key": "max_user_connections", "value": 0,   "changeable": "yes"}
         ]
+    elif query == "SHOW CLIENTS":
+        return [
+            {"name": "test", "client_user": "blah", "client_database": "blah", "client_replication": "blah", "client_state": "blah", "client_addr": "blah", "client_port": "blah", "client_local_addr": "blah", "client_local_port": "blah", "client_connect_time": "blah", "client_request_time": "blah", "client_wait": "blah", "client_wait_us": "blah", "client_ptr": "blah", "client_link": "blah", "client_tls": "blah", "client_application_name": "blah", "client_prepared_statements": "blah" },
+            {"name": "prod", "client_user": "blah", "client_database": "blah", "client_replication": "blah", "client_state": "blah", "client_addr": "blah", "client_port": "blah", "client_local_addr": "blah", "client_local_port": "blah", "client_connect_time": "blah", "client_request_time": "blah", "client_wait": "blah", "client_wait_us": "blah", "client_ptr": "blah", "client_link": "blah", "client_tls": "blah", "client_application_name": "blah", "client_prepared_statements": "blah" }
+        ]
     else:
         return False
 
@@ -69,6 +79,8 @@ def fetchMetricsPartialFailureFromPgBouncer17Mock(conn, query):
     elif query == "SHOW DATABASES":
         raise Exception("Error while fetching metrics")
     elif query == "SHOW CONFIG":
+        raise Exception("Error while fetching metrics")
+     elif query == "SHOW CLIENTS":
         raise Exception("Error while fetching metrics")
     else:
         return False
