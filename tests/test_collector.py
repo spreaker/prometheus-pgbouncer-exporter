@@ -23,8 +23,8 @@ def fetchMetricsSuccessFromPgBouncer17Mock(conn, query):
         ]
     elif query == "SHOW DATABASES":
         return [
-            {"name": "test", "database": "test", "pool_size": 50, "reserve_pool": 10, "current_connections": 30, "max_connections": 0},
-            {"name": "prod", "database": "prod", "pool_size": 90, "reserve_pool": 20, "current_connections": 75, "max_connections": 5}
+            {"name": "test","database": "test", "pool_size": 50, "reserve_pool": 10, "current_connections": 30, "max_connections": 0},
+            {"name": "prod","database": "prod", "pool_size": 90, "reserve_pool": 20, "current_connections": 75, "max_connections": 5}
         ]
     elif query == "SHOW CONFIG":
         return [
