@@ -1,5 +1,11 @@
 # Changelog
 
+### 2.1.3 (2025-03-21)
+
+- Upgraded dependencies
+   - `psycopg2` to to 2.9.10
+   - `python` to 3.8
+
 ### 2.1.2 (2021-10-08)
 
 - Upgraded dependencies
