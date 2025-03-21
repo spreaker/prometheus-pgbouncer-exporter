@@ -63,11 +63,11 @@ class PgbouncerMetricsCollector():
                     # pgbouncer >= 1.8
                     {"type": "counter", "column": "total_xact_count",  "metric": "transactions_total",                 "help": "Total number of transactions pooled"},
                     {"type": "counter", "column": "total_query_count", "metric": "queries_total",                      "help": "Total number of queries pooled"},
-                    {"type": "counter", "column": "total_xact_time",   "metric": "transactions_duration_microseconds", "help": "Total number of microseconds spent in a transaction. Includes time spent waiting for an available connection."},
-                    {"type": "counter", "column": "total_wait_time",   "metric": "waiting_duration_microseconds",      "help": "Total number of microseconds spent waiting for an available connection."},
+                    {"type": "counter", "column": "total_xact_time",   "metric": "transactions_duration_microseconds_total", "help": "Total number of microseconds spent in a transaction. Includes time spent waiting for an available connection."},
+                    {"type": "counter", "column": "total_wait_time",   "metric": "waiting_duration_microseconds_total",      "help": "Total number of microseconds spent waiting for an available connection."},
 
                     # all versions
-                    {"type": "counter", "column": "total_query_time",  "metric": "queries_duration_microseconds",      "help": "Total number of microseconds spent waiting for a server to return a query response. Includes time spent waiting for an available connection."},
+                    {"type": "counter", "column": "total_query_time",  "metric": "queries_duration_microseconds_total",      "help": "Total number of microseconds spent waiting for a server to return a query response. Includes time spent waiting for an available connection."},
                     {"type": "counter", "column": "total_received",    "metric": "received_bytes_total",               "help": "Total volume in bytes of network traffic received by pgbouncer"},
                     {"type": "counter", "column": "total_sent",        "metric": "sent_bytes_total",                   "help": "Total volume in bytes of network traffic sent by pgbouncer"},
 
