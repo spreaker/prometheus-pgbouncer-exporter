@@ -117,6 +117,31 @@ class PgbouncerMetricsCollector():
             else:
                 success = False
 
+            # SHOW CLIENTS
+            results = self._fetchMetrics(conn, "SHOW CLIENTS")
+            if results:
+                metrics += self._exportKeyValueMetrics(results, "pgbouncer_clients_", [
+                    {"type": "gauge", "key": "user",                "metric": "client_user",                "help": "Client connected user"},
+                    {"type": "gauge", "key": "database",            "metric": "client_database",            "help": "Client connected database name"},
+                    {"type": "gauge", "key": "replication",         "metric": "client_replication",         "help": "If client connection uses replication. Can be none, logical or physical"},
+                    {"type": "gauge", "key": "state",               "metric": "client_state",               "help": "Client state"},
+                    {"type": "gauge", "key": "addr",                "metric": "client_addr",                "help": "Client IP address"},
+                    {"type": "gauge", "key": "port",                "metric": "client_port",                "help": "Client source port"},
+                    {"type": "gauge", "key": "local_addr",          "metric": "client_local_addr",          "help": "Client connection end address on local machine"},
+                    {"type": "gauge", "key": "local_port",          "metric": "client_local_port",          "help": "Client connection end port on local machine"},
+                    {"type": "gauge", "key": "connect_time",        "metric": "client_connect_time",        "help": "Client connect time"},
+                    {"type": "gauge", "key": "request_time",        "metric": "client_request_time",        "help": "Client latest request times"},
+                    {"type": "gauge", "key": "wait",                "metric": "client_wait",                "help": "Client waiting time in seconds"},
+                    {"type": "gauge", "key": "wait_us",             "metric": "client_wait_us",             "help": "Client microsecond part of the current waiting time"},
+                    {"type": "gauge", "key": "ptr",                 "metric": "client_ptr",                 "help": "Address of internal object for this connection. Used as unique ID"},
+                    {"type": "gauge", "key": "link",                "metric": "client_link",                "help": "Address of server connection the client is paired with"},
+                    {"type": "gauge", "key": "tls",                 "metric": "client_tls",                 "help": "Client TLS connection information, or empty if not using TLS"},
+                    {"type": "gauge", "key": "application_name",    "metric": "client_application_name",    "help": "Client application_name for this connection, or empty if this was not set"},
+                    {"type": "gauge", "key": "prepared_statements", "metric": "client_prepared_statements", "help": "The amount of prepared statements that the client has prepared"},
+                    ], self.config.getExtraLabels())
+            else:
+                success = False
+
         except Exception as error:
             logging.getLogger().error("Unable fetch metrics from {dsn}".format(dsn=self.config.getDsnWithMaskedPassword()), extra={"exception": str(error)})
 
