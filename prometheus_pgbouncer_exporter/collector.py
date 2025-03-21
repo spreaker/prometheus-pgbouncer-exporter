@@ -30,9 +30,9 @@ class PgbouncersMetricsCollector():
         return metrics.values()
 
     def _instanceMetric(self, data):
-        if data["type"] is "counter":
+        if data["type"] == "counter":
             return CounterMetricFamily(data["name"], data["help"], labels=data["labels"].keys())
-        elif data["type"] is "gauge":
+        elif data["type"] == "gauge":
             return GaugeMetricFamily(data["name"], data["help"], labels=data["labels"].keys())
         else:
             raise Exception("Unsupported metric type: {type}".format(type=data['type']))
@@ -80,6 +80,8 @@ class PgbouncerMetricsCollector():
             if results:
                 results = self._filterMetricsByIncludeDatabases(results, self.config.getIncludeDatabases())
                 results = self._filterMetricsByExcludeDatabases(results, self.config.getExcludeDatabases())
+                if self.config.getFilterEmptyPools():
+                    results = self._filterEmptyPools(results)
                 metrics += self._exportMetrics(results, "pgbouncer_pools_", [
                     {"type": "gauge", "column": "cl_active",              "metric": "client_active_connections",   "help": "Client connections that are linked to server connection and can process queries"},
                     {"type": "gauge", "column": "cl_waiting",             "metric": "client_waiting_connections",  "help": "Client connections have sent queries but have not yet got a server connection"},
@@ -185,14 +187,33 @@ class PgbouncerMetricsCollector():
         if not databases:
             return results
 
-        return list(filter(lambda item: item["database"] in databases, results))
+        return filter(lambda item: item["database"] in databases, results)
 
     def _filterMetricsByExcludeDatabases(self, results, databases):
         # No filtering if empty
         if not databases:
             return results
 
-        return list(filter(lambda item: item["database"] not in databases, results))
+        return filter(lambda item: item["database"] not in databases, results)
+
+    def _filterEmptyPools(self, results):
+        # Filter out pools that have no client or server connections.
+        return filter(
+            lambda item: sum(
+                item[x]
+                for x in [
+                    "cl_active",
+                    "cl_waiting",
+                    "sv_active",
+                    "sv_idle",
+                    "sv_used",
+                    "sv_tested",
+                    "sv_login",
+                ]
+            )
+            > 0,
+            results,
+        )
 
     def _fetchMetrics(self, conn, query):
         cursor = False

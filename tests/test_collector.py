@@ -76,6 +76,17 @@ def fetchMetricsPartialFailureFromPgBouncer17Mock(conn, query):
 def fetchMetricsFailureMock(conn, query):
     raise Exception("Error while fetching metrics")
 
+def fetchMetricsWithEmptyPool(conn, query):
+    if query == "SHOW POOLS":
+        return [
+            {"database": "test", "user": "marco", "cl_active": 1, "cl_waiting": 2, "sv_active": 3, "sv_idle": 4, "sv_used": 5, "sv_tested": 6, "sv_login": 7, "maxwait": 8, "maxwait_us": 100000 },
+            {"database": "prod", "user": "marco", "cl_active": 8, "cl_waiting": 7, "sv_active": 6, "sv_idle": 5, "sv_used": 4, "sv_tested": 3, "sv_login": 2, "maxwait": 1, "maxwait_us": 200000 },
+            {"database": "test", "user": "empty", "cl_active": 0, "cl_waiting": 0, "sv_active": 0, "sv_idle": 0, "sv_used": 0, "sv_tested": 0, "sv_login": 0, "maxwait": 0, "maxwait_us": 0 },
+            {"database": "prod", "user": "empty", "cl_active": 0, "cl_waiting": 0, "sv_active": 0, "sv_idle": 0, "sv_used": 0, "sv_tested": 0, "sv_login": 0, "maxwait": 0, "maxwait_us": 0 },
+        ]
+
+    return []
+
 #
 # Tests
 #
@@ -428,6 +439,37 @@ class TestPgbouncerMetricsCollector(unittest.TestCase):
 
         metrics = getMetricsByName(collector.collect(), "pgbouncer_pools_client_active_connections")
         self.assertEqual(len(metrics), 0)
+
+    #
+    # Empty pool filtering
+    #
+
+    def testEmptyPoolFiltering(self):
+        # By default no filtering should be done
+        config_default = PgbouncerConfig({})
+        collector = PgbouncerMetricsCollector(config_default)
+        collector._createConnection = MagicMock(return_value=False)
+        collector._fetchMetrics = MagicMock(side_effect=fetchMetricsWithEmptyPool)
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_pools_client_active_connections")
+        self.assertEqual(len(metrics), 4)
+        self.assertEqual(list(x["labels"]["user"] for x in metrics), ["marco", "marco", "empty", "empty"])
+
+        # Same when explicitly disabled:
+        config_no_filter = PgbouncerConfig({"filter_empty_pools": False})
+        collector.config = config_no_filter
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_pools_client_active_connections")
+        self.assertEqual(len(metrics), 4)
+        self.assertEqual(list(x["labels"]["user"] for x in metrics), ["marco", "marco", "empty", "empty"])
+
+        # When filtering is on only the non-empty pools should remain:
+        config_yes_filter = PgbouncerConfig({"filter_empty_pools": True})
+        collector.config = config_yes_filter
+
+        metrics = getMetricsByName(collector.collect(), "pgbouncer_pools_client_active_connections")
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(list(x["labels"]["user"] for x in metrics), ["marco", "marco"])
 
 
 if __name__ == '__main__':
