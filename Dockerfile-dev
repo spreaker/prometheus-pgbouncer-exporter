@@ -7,3 +7,17 @@ RUN  apk add --update --no-cache postgresql-dev gcc musl-dev && \
 
 WORKDIR /prometheus-pgbouncer-exporter
 RUN python setup.py install
+
+ENV PGBOUNCER_EXPORTER_HOST="127.0.0.1" \
+    PGBOUNCER_EXPORTER_PORT=9127 \
+    PGBOUNCER_USER="pgbouncer" \
+    PGBOUNCER_PASS="" \
+    PGBOUNCER_HOST="localhost" \
+    PGBOUNCER_PORT=6432
+
+EXPOSE 9127
+
+COPY config.docker.yml /etc/pgbouncer-exporter/config.yml
+
+ENTRYPOINT ["pgbouncer-exporter"]
+CMD ["--config", "/etc/pgbouncer-exporter/config.yml"]
